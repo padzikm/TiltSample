@@ -1,7 +1,13 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: app2
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: hello-tilt-back2
+  namespace: app2
 spec:
   selector:
     matchLabels:
@@ -17,3 +23,16 @@ spec:
         image: hello-tilt-back2
         ports:
         - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: back2-svc
+  namespace: app2
+spec:
+  selector:
+    app: hello-tilt-back2
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80

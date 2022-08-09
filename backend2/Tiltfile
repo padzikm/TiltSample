@@ -18,12 +18,14 @@ local_resource(
     deps=['TiltDemoApi2'],
     ignore=['TiltDemoApi2/obj', 'TiltDemoApi2/bin'],
     # resource_deps=['deploy'],
+    labels=['back2']
 )
 
 local_resource(
     'script-back2',
     'cp ./script.sh ./out/script.sh',
-    resource_deps=['build-back2']
+    resource_deps=['build-back2'],
+    labels=['back2']
 )
 
 docker_build_with_restart(
@@ -37,4 +39,4 @@ docker_build_with_restart(
 )
 
 k8s_yaml('kubernetes.yaml')
-k8s_resource('hello-tilt-back2', port_forwards=['8082:80', '22001:22'], resource_deps=['script-back2'])
+k8s_resource('hello-tilt-back2', port_forwards=['8082:80', '22001:22'], resource_deps=['script-back2'], labels=['back2'])

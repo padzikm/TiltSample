@@ -1,7 +1,13 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: app1
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: hello-tilt-back
+  namespace: app1
 spec:
   selector:
     matchLabels:

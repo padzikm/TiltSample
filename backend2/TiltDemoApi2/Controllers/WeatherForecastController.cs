@@ -33,6 +33,6 @@ public class WeatherForecastController : ControllerBase
     [HttpGet("bla")]
     public string Get2()
     {
-        return "Hello world16";
+        return "Hello world20";
     }
 }
