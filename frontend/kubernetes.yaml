@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-tilt-front
+spec:
+  selector:
+    matchLabels:
+      app: hello-tilt-front
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: hello-tilt-front
+    spec:
+      containers:
+      - name: hello-tilt-front
+        image: hello-tilt-front
+        ports:
+        - containerPort: 80

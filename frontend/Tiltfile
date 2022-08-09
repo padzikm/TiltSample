@@ -1,0 +1,67 @@
+# -*- mode: Python -*-
+
+# For more on Extensions, see: https://docs.tilt.dev/extensions.html
+load('ext://restart_process', 'docker_build_with_restart')
+
+# Records the current time, then kicks off a server update.
+# Normally, you would let Tilt do deploys automatically, but this
+# shows you how to set up a custom workflow that measures it.
+# local_resource(
+#     'deploy',
+#     'python ./record-start-time.py',
+#     deps=['./record-start-time.py'],
+# )
+
+local_resource(
+    'pkgs-front',
+    'npm install',
+    # deps=['package-lock.json'],
+    # ignore=['TiltDemoApi/obj', 'TiltDemoApi/bin'],
+    # resource_deps=['deploy'],
+)
+
+local_resource(
+    'build-front',
+    # 'echo success',
+    serve_cmd='ng build --watch --configuration=development --delete-output-path=false',
+    # deps=['src'],
+    # ignore=['TiltDemoApi/obj', 'TiltDemoApi/bin'],
+    resource_deps=['pkgs-front'],
+)
+
+local_resource(
+    'script-front',
+    'cp ./nginx.conf ./dist',
+    resource_deps=['build-front']
+)
+
+docker_build_with_restart(
+    'hello-tilt-front',
+    'dist',
+    entrypoint=["nginx", "-g", "daemon off;"],
+    dockerfile='Dockerfile',
+    live_update=[
+        sync('dist/frontend', '/usr/share/nginx/html'),
+    ],
+)
+
+# docker_build(
+#     'hello-tilt-front',
+#     '.',
+#     # entrypoint='npm run start',
+#     dockerfile='Dockerfile.serve',
+#     live_update=[
+#         sync('src', '/app/src'),
+#         sync('angular.json', '/app/'),
+#         sync('package.json', '/app/'),
+#         sync('package-lock.json', '/app/'),
+#         sync('tsconfig.app.json', '/app/'),
+#         sync('tsconfig.json', '/app/'),
+#         run('cd /app && npm install', trigger='package-lock.json')
+#     ],
+#     only=['src', 'angular.json', 'Dockerfile.serve', 'package-lock.json', 'package.json', 'tsconfig.app.json', 'tsconfig.json']
+# )
+
+k8s_yaml('kubernetes.yaml')
+k8s_resource('hello-tilt-front', port_forwards=['8081:80'], resource_deps=['script-front'])
+# k8s_resource('hello-tilt-front', port_forwards=['4200:4200'])

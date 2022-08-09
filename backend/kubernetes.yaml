@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-tilt-back
+spec:
+  selector:
+    matchLabels:
+      app: hello-tilt-back
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: hello-tilt-back
+    spec:
+      containers:
+      - name: hello-tilt-back
+        image: hello-tilt-back
+        ports:
+        - containerPort: 80

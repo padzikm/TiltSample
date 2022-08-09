@@ -1,0 +1,17 @@
+FROM node:16.16
+
+# RUN npm install -g ng-cli
+
+WORKDIR /app
+
+COPY package-lock.json .
+COPY package.json .
+
+# RUN npm install
+
+COPY angular.json .
+COPY tsconfig.app.json .
+COPY tsconfig.json .
+COPY src/ src/
+
+ENTRYPOINT npm run runall
