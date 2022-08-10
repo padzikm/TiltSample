@@ -9,6 +9,10 @@ out/
 bin/
 obj/
 
+*.tfstate
+*.tfstate.*
+.terraform/
+
 # Node
 /node_modules
 npm-debug.log
