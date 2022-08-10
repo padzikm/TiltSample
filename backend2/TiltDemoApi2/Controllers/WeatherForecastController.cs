@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using TiltDemoApi2.Database;
 
 namespace TiltDemoApi2.Controllers;
 
@@ -12,10 +14,12 @@ public class WeatherForecastController : ControllerBase
     };
 
     private readonly ILogger<WeatherForecastController> _logger;
+    private readonly AppDbContext _dbContext;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger)
+    public WeatherForecastController(ILogger<WeatherForecastController> logger, AppDbContext dbContext)
     {
         _logger = logger;
+        _dbContext = dbContext;
     }
 
     [HttpGet(Name = "GetWeatherForecast")]
@@ -34,5 +38,23 @@ public class WeatherForecastController : ControllerBase
     public string Get2()
     {
         return "Hello world20";
+    }
+
+    [HttpGet("savedb/{age}")]
+    public async Task<ActionResult> SaveData(int age)
+    {
+        var m = new Model() { Date = DateTime.Now, Age = age };
+        _dbContext.SecondData.Add(m);
+        await _dbContext.SaveChangesAsync();
+        
+        return Ok(m);
+    }
+    
+    [HttpGet("getdb/{age}")]
+    public async Task<ActionResult> GetData(int age)
+    {
+        var m = await _dbContext.SecondData.Where(p => p.Age == age).ToListAsync();
+        
+        return Ok(m);
     }
 }
