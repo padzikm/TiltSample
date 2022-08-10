@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using TiltDemoApi.Database;
 
 namespace TiltDemoApi.Controllers;
 
@@ -13,11 +15,13 @@ public class WeatherForecastController : ControllerBase
 
     private readonly ILogger<WeatherForecastController> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly AppDbContext _dbContext;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger, IHttpClientFactory httpClientFactory)
+    public WeatherForecastController(ILogger<WeatherForecastController> logger, IHttpClientFactory httpClientFactory, AppDbContext dbContext)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
+        _dbContext = dbContext;
     }
 
     [HttpGet(Name = "GetWeatherForecast")]
@@ -40,5 +44,23 @@ public class WeatherForecastController : ControllerBase
         var t = await res.Content.ReadAsStringAsync();
         return t;
         // return "Hello world16";
+    }
+    
+    [HttpGet("savedb/{name}")]
+    public async Task<ActionResult> SaveData(string name)
+    {
+        var m = new Model() { Date = DateTime.Now, Name = name };
+        _dbContext.FirstData.Add(m);
+        await _dbContext.SaveChangesAsync();
+        
+        return Ok(m);
+    }
+    
+    [HttpGet("getdb/{name}")]
+    public async Task<ActionResult> GetData(string name)
+    {
+        var m = await _dbContext.FirstData.Where(p => p.Name == name).ToListAsync();
+        
+        return Ok(m);
     }
 }

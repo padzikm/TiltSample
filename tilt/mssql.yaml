@@ -26,7 +26,7 @@ spec:
   - port: 1433
     nodePort: 31437
   selector:
-    app: mssql
+    statefulset.kubernetes.io/pod-name: mssql-0
 ---
 apiVersion: apps/v1
 kind: StatefulSet

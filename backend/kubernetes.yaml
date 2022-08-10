@@ -56,5 +56,8 @@ spec:
         image: hello-tilt-back1
         ports:
         - containerPort: 80
+        env:
+        - name: "ConnectionStrings__Back1Db"
+          value: "Server=mssql-0.mssql-headless.db,1433;Database=Back1Db;User Id=sa;Password=Password1.;"
 ---
             
