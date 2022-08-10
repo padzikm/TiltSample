@@ -3,23 +3,58 @@ kind: Namespace
 metadata:
   name: app1
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: back1-svc
+  namespace: app1
+spec:
+  selector:
+    app: hello-tilt-back1
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: back1-ingress
+  namespace: app1
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+        - path: /back1(/|$)(.*)
+          backend:
+            service:
+              name: back1-svc
+              port:
+                number: 80
+          pathType: Prefix
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hello-tilt-back
+  name: hello-tilt-back1
   namespace: app1
 spec:
   selector:
     matchLabels:
-      app: hello-tilt-back
+      app: hello-tilt-back1
   replicas: 1
   template:
     metadata:
       labels:
-        app: hello-tilt-back
+        app: hello-tilt-back1
     spec:
       containers:
-      - name: hello-tilt-back
-        image: hello-tilt-back
+      - name: hello-tilt-back1
+        image: hello-tilt-back1
         ports:
         - containerPort: 80
+---
+            

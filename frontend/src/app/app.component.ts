@@ -10,6 +10,6 @@ export class AppComponent {
 
 
   clickme(){
-    fetch('http://localhost:8080/WeatherForecast/bla').then(r => r.text()).then(v => console.log(v));
+    fetch('/back1/WeatherForecast/bla').then(r => r.text()).then(v => console.log(v));
   }
 }

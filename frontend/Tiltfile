@@ -24,7 +24,7 @@ local_resource(
 local_resource(
     'build-front',
     # 'echo success',
-    serve_cmd='ng build --watch --configuration=development --delete-output-path=false',
+    serve_cmd='ng build --watch --configuration=development --delete-output-path=false --base-href=/front/',
     # deps=['src'],
     # ignore=['TiltDemoApi/obj', 'TiltDemoApi/bin'],
     resource_deps=['pkgs-front'],
@@ -34,6 +34,7 @@ local_resource(
 local_resource(
     'script-front',
     'cp ./nginx.conf ./dist',
+    deps=['nginx.conf'],
     resource_deps=['build-front'],
     labels=['front', 'app1']
 )
