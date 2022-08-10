@@ -4,6 +4,24 @@ metadata:
   name: app2
 ---
 apiVersion: v1
+kind: Secret
+metadata:
+  name: secrets
+  namespace: app2
+type: Opaque
+stringData:
+  mssql_password: "Password1."
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config
+  namespace: app2
+data:
+  db_server: "mssql-0.mssql-headless.db,1433"
+  db_user: "sa"
+---
+apiVersion: v1
 kind: Service
 metadata:
   name: back2-svc
@@ -56,7 +74,14 @@ spec:
         image: hello-tilt-back2
         ports:
         - containerPort: 80
+        envFrom:
+        - configMapRef:
+            name: config
+            optional: false
+        - secretRef:
+            name: secrets
+            optional: false
         env:
         - name: "ConnectionStrings__Back2Db"
-          value: "Server=mssql-0.mssql-headless.db,1433;Database=Back2Db;User Id=sa;Password=Password1.;"
+          value: "Server=$(db_server);Database=Back2Db;User Id=$(db_user);Password=$(mssql_password);"
 ---
