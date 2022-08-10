@@ -1,6 +1,14 @@
 
 k8s_yaml('mssql.yaml')
 
+docker_build(
+    'rabbitmq-local',
+    '.',
+    dockerfile='Dockerfile.rabbitmq'
+)
+
+k8s_yaml('rabbitmq.yaml')
+
 include('../backend/Tiltfile')
 include('../backend2/Tiltfile')
 include('../frontend/Tiltfile')

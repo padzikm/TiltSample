@@ -20,6 +20,7 @@ metadata:
 data:
   db_server: "mssql-0.mssql-headless.db,1433"
   db_user: "sa"
+  Back2_Base_Url: "http://back2-svc.app2"
 ---
 apiVersion: v1
 kind: Service

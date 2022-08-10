@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: msgbroker
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: secrets
+  namespace: msgbroker
+type: Opaque
+stringData:
+  rabbitmq_password: "quest"
+  rabbitmq_user: "quest"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq-headless
+  namespace: msgbroker
+spec:
+  ports:
+  - port: 5672
+  clusterIP: None
+  selector:
+    app: rabbitmq
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+  namespace: msgbroker
+spec:
+  type: NodePort
+  ports:
+  - name: api
+    port: 5672
+    nodePort: 30672
+  - name: ui
+    port: 15672
+    nodePort: 31672
+  selector:
+    statefulset.kubernetes.io/pod-name: rabbitmq-0
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rabbitmq
+  namespace: msgbroker
+spec:
+  selector:
+    matchLabels:
+      app: rabbitmq
+  serviceName: "rabbitmq-headless"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: rabbitmq
+        image: rabbitmq-local
+        ports:
+        - containerPort: 5672
+          name: api
+        - containerPort: 15672
+          name: ui
+        volumeMounts:
+        - name: rabbitmq-data
+          mountPath: /var/lib/rabbitmq
+  volumeClaimTemplates:
+  - metadata:
+      name: rabbitmq-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "local-path"
+      resources:
+        requests:
+          storage: 1Gi

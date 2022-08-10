@@ -16,12 +16,14 @@ public class WeatherForecastController : ControllerBase
     private readonly ILogger<WeatherForecastController> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly AppDbContext _dbContext;
+    private readonly IConfiguration _config;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger, IHttpClientFactory httpClientFactory, AppDbContext dbContext)
+    public WeatherForecastController(ILogger<WeatherForecastController> logger, IHttpClientFactory httpClientFactory, AppDbContext dbContext, IConfiguration config)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _dbContext = dbContext;
+        _config = config;
     }
 
     [HttpGet(Name = "GetWeatherForecast")]
@@ -39,8 +41,10 @@ public class WeatherForecastController : ControllerBase
     [HttpGet("bla")]
     public async Task<string> Get2()
     {
+        var baseurl = _config["Back2_Base_Url"];
+        var url = $"{baseurl}/WeatherForecast/bla";
         var httpClient = _httpClientFactory.CreateClient();
-        var res = await httpClient.GetAsync("http://back2-svc.app2/WeatherForecast/bla");
+        var res = await httpClient.GetAsync(url);
         var t = await res.Content.ReadAsStringAsync();
         return t;
         // return "Hello world16";
