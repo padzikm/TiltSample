@@ -37,7 +37,7 @@ local_resource(
 local_resource(
     'db-update-back',
     'cd TiltDemoApi && dotnet ef database update',
-    resource_deps=['script-back'],
+    resource_deps=['script-back', 'mssql'],
     labels=['back', 'app1']
 )
 
