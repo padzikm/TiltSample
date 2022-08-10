@@ -4,12 +4,15 @@ k8s_yaml('mssql.yaml')
 docker_build(
     'rabbitmq-local',
     '.',
-    dockerfile='Dockerfile.rabbitmq'
+    dockerfile='Dockerfile.rabbitmq',
+    only=['Dockerfile.rabbitmq']
 )
 
 k8s_yaml('rabbitmq.yaml')
 
-local_resource('tf plan', 'cd terraform && terraform plan', deps=['terraform'], ignore=['terraform/*.tfstate', 'terraform/*.tfstate.*', 'terraform/.terraform/', 'terraform/.terraform.*'], labels=['tf'])
+# k8s_resource('rabbitmq')
+
+local_resource('tf plan', 'cd terraform && terraform plan', deps=['terraform'], resource_deps=['rabbitmq'], ignore=['terraform/*.tfstate', 'terraform/*.tfstate.*', 'terraform/.terraform/', 'terraform/.terraform.*'], labels=['tf'])
 
 local_resource('tf apply', 'cd terraform && terraform apply -auto-approve', resource_deps=['tf plan'], deps=['terraform'], ignore=['terraform/*.tfstate', 'terraform/*.tfstate.*', 'terraform/.terraform/', 'terraform/.terraform.*'], labels=['tf'])
 
