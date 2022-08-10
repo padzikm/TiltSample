@@ -56,4 +56,7 @@ spec:
         image: hello-tilt-back2
         ports:
         - containerPort: 80
+        env:
+        - name: "ConnectionStrings__Back2Db"
+          value: "Server=mssql-0.mssql-headless.db,1433;Database=Back2Db;User Id=sa;Password=Password1.;"
 ---

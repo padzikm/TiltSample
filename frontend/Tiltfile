@@ -43,6 +43,7 @@ docker_build_with_restart(
     'hello-tilt-front',
     'dist',
     entrypoint=["nginx", "-g", "daemon off;"],
+    # entrypoint=["/app/script.sh"],
     dockerfile='Dockerfile',
     live_update=[
         sync('dist/frontend', '/usr/share/nginx/html'),

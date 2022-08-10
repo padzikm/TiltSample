@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/bin/sh
 
 if [[ -f ./lock ]]; then
-    ec
+    nginx -s reload
 else
-    touch ./lock && nginx -g 
+    touch ./lock && nginx -g "daemon off;"
 fi
