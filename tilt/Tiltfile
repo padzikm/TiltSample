@@ -1,11 +1,14 @@
 
-config. define_string('build')
+config.define_string('build')
+config.define_string('rider')
 config.define_string_list("args", args=True)
 cfg = config.parse()
 config.set_enabled_resources(cfg.get('args', []))
 buildcfg = cfg.get('build')
+riderver = cfg.get('rider', '')
 print(buildcfg)
 os.putenv('buildconfig', buildcfg)
+os.putenv('riderver', riderver)
 
 k8s_yaml('mssql.yaml')
 

@@ -11,7 +11,8 @@ load('ext://restart_process', 'docker_build_with_restart')
 #     'python ./record-start-time.py',
 #     deps=['./record-start-time.py'],
 # )
-buildconf = os.getenv('buildconfig', 'Debug')
+buildconf = os.getenv('buildconfig')
+riderver = os.getenv('riderver')
 
 local_resource(
     'tool-restore-back',
@@ -47,6 +48,7 @@ docker_build_with_restart(
     'out',
     entrypoint=['./script.sh'],
     dockerfile='Dockerfile',
+    build_args={'RIDER_VER': riderver},
     live_update=[
         sync('out', '/app/out'),
     ],

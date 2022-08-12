@@ -7,10 +7,13 @@ RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/g' /etc/ssh
 
 EXPOSE 22
 
-WORKDIR /root/.local/share/JetBrains/RiderRemoteDebugger/2022.1.2
+ARG RIDER_VER
+WORKDIR /root/.local/share/JetBrains/RiderRemoteDebugger/$RIDER_VER
 
-RUN wget -O rider_debug_tools.zip https://data.services.jetbrains.com/products/download\?code\=RRD\&platform\=linux64
-RUN unzip -n rider_debug_tools.zip
+RUN if [ -n "$RIDER_VER" ]; then wget -O rider_debug_tools.zip https://data.services.jetbrains.com/products/download\?code\=RRD\&platform\=linux64 \
+    && unzip -n rider_debug_tools.zip \
+    && rm rider_debug_tools.zip; \
+    else echo 'skipping rider debugging tools'; fi
 
 COPY . /app/out
 WORKDIR /app/out

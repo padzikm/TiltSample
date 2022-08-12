@@ -1,3 +1,4 @@
 {
-    "build": "Debug"
+    "build": "Debug",
+    "rider": "2022.2.1"
 }

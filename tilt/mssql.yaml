@@ -82,9 +82,9 @@ spec:
         readinessProbe:
           exec:
             command: ["bash", "-c", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $MSSQL_SA_PASSWORD -d master -Q \"SELECT 1;\""]
-          initialDelaySeconds: 5
-          periodSeconds: 2
-          timeoutSeconds: 1
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 5
   volumeClaimTemplates:
   - metadata:
       name: mssql-data
