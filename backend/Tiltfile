@@ -11,6 +11,7 @@ load('ext://restart_process', 'docker_build_with_restart')
 #     'python ./record-start-time.py',
 #     deps=['./record-start-time.py'],
 # )
+buildconf = os.getenv('buildconfig', 'Debug')
 
 local_resource(
     'tool-restore-back',
@@ -20,7 +21,7 @@ local_resource(
 
 local_resource(
     'build-back',
-    'dotnet publish -c Debug -o out',
+    'dotnet publish -c {buildconf} -o out'.format(buildconf=buildconf),
     deps=['TiltDemoApi'],
     ignore=['TiltDemoApi/obj', 'TiltDemoApi/bin'],
     resource_deps=['tool-restore-back'],
@@ -52,4 +53,4 @@ docker_build_with_restart(
 )
 
 k8s_yaml('kubernetes.yaml', allow_duplicates=True)
-k8s_resource('hello-tilt-back1', port_forwards=['8083:80', '22000:22'], resource_deps=['db-update-back'], labels=['back', 'app1'])
+k8s_resource('hello-tilt-back1', port_forwards=['22000:22'], resource_deps=['db-update-back'], labels=['back', 'app1'])

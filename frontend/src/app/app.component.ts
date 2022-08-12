@@ -10,6 +10,6 @@ export class AppComponent {
 
 
   clickme(){
-    fetch('/back1/WeatherForecast/bla').then(r => r.text()).then(v => console.log(v));
+    fetch('__BACK1_URL__/WeatherForecast/bla').then(r => r.text()).then(v => console.log(v));
   }
 }

@@ -1,4 +1,12 @@
 
+config. define_string('build')
+config.define_string_list("args", args=True)
+cfg = config.parse()
+config.set_enabled_resources(cfg.get('args', []))
+buildcfg = cfg.get('build')
+print(buildcfg)
+os.putenv('buildconfig', buildcfg)
+
 k8s_yaml('mssql.yaml')
 
 docker_build(
@@ -9,8 +17,6 @@ docker_build(
 )
 
 k8s_yaml('rabbitmq.yaml')
-
-# k8s_resource('rabbitmq')
 
 local_resource('tf plan', 'cd terraform && terraform plan', deps=['terraform'], resource_deps=['rabbitmq'], ignore=['terraform/*.tfstate', 'terraform/*.tfstate.*', 'terraform/.terraform/', 'terraform/.terraform.*'], labels=['tf'])
 

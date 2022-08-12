@@ -56,4 +56,7 @@ spec:
         image: hello-tilt-front
         ports:
         - containerPort: 80
+        env:
+        - name: ENV_BACK1_URL
+          value: http://localhost:8080/back1
 ---

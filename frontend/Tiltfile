@@ -42,7 +42,7 @@ local_resource(
 docker_build_with_restart(
     'hello-tilt-front',
     'dist',
-    entrypoint=["nginx", "-g", "daemon off;"],
+    entrypoint=["/docker-entrypoint.sh", "nginx", "-g", "daemon off;"],
     # entrypoint=["/app/script.sh"],
     dockerfile='Dockerfile',
     live_update=[
@@ -68,5 +68,5 @@ docker_build_with_restart(
 # )
 
 k8s_yaml('kubernetes.yaml', allow_duplicates=True)
-k8s_resource('hello-tilt-front', port_forwards=['8081:80'], resource_deps=['script-front'], labels=['front', 'app1'])
+k8s_resource('hello-tilt-front', resource_deps=['script-front'], labels=['front', 'app1'])
 # k8s_resource('hello-tilt-front', port_forwards=['4200:4200'])
