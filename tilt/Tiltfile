@@ -27,7 +27,9 @@ docker_build(
 
 k8s_yaml('rabbitmq.yaml')
 
-local_resource('tf plan', 'cd terraform && terraform plan', deps=['terraform'], resource_deps=['rabbitmq'], ignore=['terraform/*.tfstate', 'terraform/*.tfstate.*', 'terraform/.terraform/', 'terraform/.terraform.*'], labels=['tf'])
+local_resource('tf init', 'cd terraform && terraform init', deps=['terraform'], resource_deps=['rabbitmq'], ignore=['terraform/*.tfstate', 'terraform/*.tfstate.*', 'terraform/.terraform/', 'terraform/.terraform.*'], labels=['tf'])
+
+local_resource('tf plan', 'cd terraform && terraform plan', deps=['terraform'], resource_deps=['tf init'], ignore=['terraform/*.tfstate', 'terraform/*.tfstate.*', 'terraform/.terraform/', 'terraform/.terraform.*'], labels=['tf'])
 
 local_resource('tf apply', 'cd terraform && terraform apply -auto-approve', resource_deps=['tf plan'], deps=['terraform'], ignore=['terraform/*.tfstate', 'terraform/*.tfstate.*', 'terraform/.terraform/', 'terraform/.terraform.*'], labels=['tf'])
 
