@@ -4,6 +4,15 @@ metadata:
   name: app1
 ---
 apiVersion: v1
+kind: Secret
+metadata:
+  name: front-secrets
+  namespace: app1
+type: Opaque
+stringData:
+  BACK1_URL: ''
+---
+apiVersion: v1
 kind: Service
 metadata:
   name: front-svc
@@ -58,5 +67,9 @@ spec:
         - containerPort: 80
         env:
         - name: ENV_BACK1_URL
-          value: http://localhost:8080/back1
+          valueFrom:
+            secretKeyRef:
+              name: front-secrets
+              key: BACK1_URL
+              optional: false
 ---

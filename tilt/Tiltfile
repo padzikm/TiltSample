@@ -7,10 +7,16 @@ config.set_enabled_resources(cfg.get('args', []))
 buildcfg = cfg.get('build')
 riderver = cfg.get('rider', '')
 print(buildcfg)
+os.putenv('entryhttpurl', 'http://localhost:8080')
 os.putenv('buildconfig', buildcfg)
 os.putenv('riderver', riderver)
+os.putenv('mssqlserver', 'mssql-0.mssql-headless.db,1433')
+os.putenv('mssqluser', 'sa')
+mssqlpassword = 'Password1.'
+os.putenv('mssqlpassword', mssqlpassword)
+os.putenv('MSSQL_SA_PASSWORD', mssqlpassword)
 
-k8s_yaml('mssql.yaml')
+k8s_yaml(kustomize('.'))
 
 docker_build(
     'rabbitmq-local',

@@ -37,7 +37,7 @@ public class WeatherForecastController : ControllerBase
     [HttpGet("bla")]
     public string Get2()
     {
-        return "Hello world21";
+        return "Hello world22";
     }
 
     [HttpGet("savedb/{age}")]

@@ -10,7 +10,7 @@ metadata:
   namespace: app2
 type: Opaque
 stringData:
-  mssql_password: "Password1."
+  MSSQLCONNECTIONSTRING: ''
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -83,5 +83,9 @@ spec:
             optional: false
         env:
         - name: "ConnectionStrings__Back2Db"
-          value: "Server=$(db_server);Database=Back2Db;User Id=$(db_user);Password=$(mssql_password);"
+          valueFrom:
+            secretKeyRef:
+              key: MSSQLCONNECTIONSTRING
+              name: secrets
+              optional: false
 ---

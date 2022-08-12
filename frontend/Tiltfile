@@ -12,6 +12,9 @@ load('ext://restart_process', 'docker_build_with_restart')
 #     deps=['./record-start-time.py'],
 # )
 
+entryhttpurl = os.getenv('entryhttpurl')
+os.putenv('BACK1_URL', '{entryhttpurl}/back1'.format(entryhttpurl=entryhttpurl))
+
 local_resource(
     'pkgs-front',
     'npm install',
@@ -67,6 +70,6 @@ docker_build_with_restart(
 #     only=['src', 'angular.json', 'Dockerfile.serve', 'package-lock.json', 'package.json', 'tsconfig.app.json', 'tsconfig.json']
 # )
 
-k8s_yaml('kubernetes.yaml', allow_duplicates=True)
+k8s_yaml(kustomize('.'), allow_duplicates=True)
 k8s_resource('hello-tilt-front', resource_deps=['script-front'], labels=['front', 'app1'])
 # k8s_resource('hello-tilt-front', port_forwards=['4200:4200'])

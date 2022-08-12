@@ -1,0 +1,8 @@
+resources:
+- kubernetes.yaml
+secretGenerator:
+- name: secrets
+  namespace: app2
+  behavior: merge
+  envs:
+  - .k8s_env

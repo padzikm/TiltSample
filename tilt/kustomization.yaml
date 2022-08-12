@@ -1,0 +1,8 @@
+resources:
+- mssql.yaml
+secretGenerator:
+- name: secrets
+  namespace: db
+  behavior: merge
+  envs:
+  - .k8s_env

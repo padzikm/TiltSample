@@ -10,7 +10,7 @@ metadata:
   namespace: app1
 type: Opaque
 stringData:
-  mssql_password: "Password1."
+  MSSQLCONNECTIONSTRING: ''
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -18,8 +18,6 @@ metadata:
   name: config
   namespace: app1
 data:
-  db_server: "mssql-0.mssql-headless.db,1433"
-  db_user: "sa"
   Back2_Base_Url: "http://back2-svc.app2"
 ---
 apiVersion: v1
@@ -79,11 +77,12 @@ spec:
         - configMapRef:
             name: config
             optional: false
-        - secretRef:
-            name: secrets
-            optional: false
         env:
         - name: "ConnectionStrings__Back1Db"
-          value: "Server=$(db_server);Database=Back1Db;User Id=$(db_user);Password=$(mssql_password);"
+          valueFrom:
+            secretKeyRef:
+              key: MSSQLCONNECTIONSTRING
+              name: secrets
+              optional: false
 ---
             

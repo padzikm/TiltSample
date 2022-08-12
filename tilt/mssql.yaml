@@ -10,7 +10,7 @@ metadata:
   namespace: db
 type: Opaque
 stringData:
-  mssql_password: "Password1."
+  MSSQL_SA_PASSWORD: ''
 ---
 apiVersion: v1
 kind: Service
@@ -68,7 +68,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: secrets
-              key: mssql_password
+              key: MSSQL_SA_PASSWORD
               optional: false
         volumeMounts:
         - name: mssql-data

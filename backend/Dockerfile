@@ -10,7 +10,7 @@ EXPOSE 22
 ARG RIDER_VER
 WORKDIR /root/.local/share/JetBrains/RiderRemoteDebugger/$RIDER_VER
 
-RUN if [ -n "$RIDER_VER" ]; then wget -O rider_debug_tools.zip https://data.services.jetbrains.com/products/download\?code\=RRD\&platform\=linux64 \
+RUN if [ -n "$RIDER_VER" ]; then wget -O rider_debug_tools.zip "https://download.jetbrains.com/resharper/dotUltimate.$RIDER_VER/JetBrains.Rider.RemoteDebuggerUploads.linux-x64.$RIDER_VER.zip" \
     && unzip -n rider_debug_tools.zip \
     && rm rider_debug_tools.zip; \
     else echo 'skipping rider debugging tools'; fi

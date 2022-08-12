@@ -13,6 +13,12 @@ load('ext://restart_process', 'docker_build_with_restart')
 # )
 buildconf = os.getenv('buildconfig')
 riderver = os.getenv('riderver')
+mssqlserver = os.getenv('mssqlserver')
+mssqluser = os.getenv('mssqluser')
+mssqlpassword = os.getenv('mssqlpassword')
+
+connstring = 'Server={db_server};Database=Back1Db;User Id={db_user};Password={mssql_password};'.format(db_server=mssqlserver, db_user=mssqluser, mssql_password=mssqlpassword)
+os.putenv('MSSQLCONNECTIONSTRING', connstring)
 
 local_resource(
     'tool-restore-back',
@@ -54,5 +60,5 @@ docker_build_with_restart(
     ],
 )
 
-k8s_yaml('kubernetes.yaml', allow_duplicates=True)
+k8s_yaml(kustomize('.'), allow_duplicates=True)
 k8s_resource('hello-tilt-back1', port_forwards=['22000:22'], resource_deps=['db-update-back'], labels=['back', 'app1'])
