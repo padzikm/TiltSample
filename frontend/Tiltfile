@@ -27,7 +27,7 @@ local_resource(
 local_resource(
     'build-front',
     # 'echo success',
-    serve_cmd='ng build --watch --configuration=development --delete-output-path=false --base-href=/front/',
+    serve_cmd='npm run build:tilt',
     # deps=['src'],
     # ignore=['TiltDemoApi/obj', 'TiltDemoApi/bin'],
     resource_deps=['pkgs-front'],

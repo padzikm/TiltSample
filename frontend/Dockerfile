@@ -1,7 +1,7 @@
 FROM nginx:stable-alpine
 
-COPY ./script.sh /app/
-RUN chmod +x /app/script.sh
+# COPY ./script.sh /app/
+# RUN chmod +x /app/script.sh
 
 COPY ./nginx.conf /etc/nginx/templates/default.conf.template
 COPY ./frontend /usr/share/nginx/html

@@ -6,6 +6,7 @@
     "start": "ng serve",
     "runall": "npm install && npm run start",
     "build": "ng build",
+    "build:tilt": "ng build --watch --configuration=development --delete-output-path=false --base-href=/front/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
