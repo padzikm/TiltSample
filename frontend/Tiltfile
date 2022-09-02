@@ -25,12 +25,28 @@ local_resource(
 )
 
 local_resource(
+    'create-dist-front',
+    'mkdir -p ./dist',
+    resource_deps=['pkgs-front'],
+    labels=['front', 'app1']
+)
+
+local_resource(
+    'validate-build-front',
+    """if [ -f dist/frontend/stats.json ]; then if [ "$(grep -c '"errorsCount":0' dist/frontend/stats.json)" = "1" ]; then echo 'build succeeded'; else echo 'build failed'; exit 1; fi; else echo 'stats not found'; fi""",
+    deps=['dist/frontend/stats.json'],
+    # ignore=['TiltDemoApi/obj', 'TiltDemoApi/bin'],
+    resource_deps=['create-dist-front'],
+    labels=['front', 'app1']
+)
+
+local_resource(
     'build-front',
     # 'echo success',
     serve_cmd='npm run build:tilt',
     # deps=['src'],
     # ignore=['TiltDemoApi/obj', 'TiltDemoApi/bin'],
-    resource_deps=['pkgs-front'],
+    resource_deps=['create-dist-front'],
     labels=['front', 'app1']
 )
 
@@ -38,7 +54,7 @@ local_resource(
     'script-front',
     'cp ./nginx.conf ./dist',
     deps=['nginx.conf'],
-    resource_deps=['build-front'],
+    resource_deps=['create-dist-front'],
     labels=['front', 'app1']
 )
 
