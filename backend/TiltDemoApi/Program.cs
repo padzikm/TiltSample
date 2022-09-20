@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using TiltDemoApi.Configuration;
 using TiltDemoApi.Database;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 builder.Services.AddCors();
+
+builder.Services.Configure<ConfigBack2>(builder.Configuration.GetSection(ConfigBack2.Key));
+builder.Services.AddOptions<ConfigFront>().Bind(builder.Configuration.GetSection(ConfigFront.Key)).ValidateDataAnnotations().ValidateOnStart();
+builder.Services.AddOptions<ConfigMap>().Bind(builder.Configuration.GetSection(ConfigMap.Key)).ValidateDataAnnotations().ValidateOnStart();
 
 builder.Services.AddDbContext<AppDbContext>(o => o.UseSqlServer(builder.Configuration.GetConnectionString("Back1Db")));
 
