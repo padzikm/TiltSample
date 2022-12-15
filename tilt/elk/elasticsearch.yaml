@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: secret-basic-auth-elastic
+type: kubernetes.io/basic-auth
+stringData:
+  username: elastic
+  password: elastic
+  roles: superuser
+---
+apiVersion: elasticsearch.k8s.elastic.co/v1
+kind: Elasticsearch
+metadata:
+  name: elasticsearch
+spec:
+  version: 8.5.3
+  auth:
+    fileRealm:
+    - secretName: secret-basic-auth-elastic
+  nodeSets:
+  - name: default
+    count: 1
+    config:
+      node.store.allow_mmap: false
+  http:
+    service:
+      spec:
+        type: LoadBalancer
+    tls:
+      selfSignedCertificate:
+        disabled: true

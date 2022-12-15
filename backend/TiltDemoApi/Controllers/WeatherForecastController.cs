@@ -105,6 +105,7 @@ public class WeatherForecastController : ControllerBase
     public ActionResult GetConfigMap()
     {
         var cfg = _configmap.Value;
+        Console.WriteLine("cokolwiek");
         
         return cfg == null ? Ok("null") : Ok(cfg);
     }
