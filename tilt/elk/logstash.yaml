@@ -1,0 +1,241 @@
+metadata:
+  labels:
+    app: logstash
+  name: logger-logstash-patterns
+kind: ConfigMap
+data: null
+apiVersion: v1
+---
+metadata:
+  labels:
+    app: logstash
+  name: logger-logstash-pipeline
+kind: ConfigMap
+data:
+  input_main.conf: |-
+    input {
+      beats {
+        port => 5044
+      }
+    }
+  filter_main.conf: |-
+    filter {
+      json {
+        skip_on_invalid_json => true
+        source => "message"
+      }
+    }
+  output_main.conf: |-
+    output {
+        if ([kubernetes][namespace] == "app1"
+            or[kubernetes][namespace] == "app2") {
+            elasticsearch {
+                user => "elastic"
+                password => "${ELPASSWORD}"
+                hosts => ["http://elasticsearch-es-http.default.svc:9200"]
+                ssl => false
+                ssl_certificate_verification => false
+                ilm_rollover_alias => "applicationalias"
+                ilm_pattern => "{now/d}-0001"
+                ilm_policy => "application_policy"
+        }
+      }
+    }
+apiVersion: v1
+---
+metadata:
+  name: logging-configurator
+kind: ConfigMap
+data:
+  elastic.sh: |
+    curl -u elastic:PW_REPLACE -XPUT -H"Content-Type: application/json" --data @- \
+        http://elasticsearch-es-http.default.svc:9200/_template/application_template <<EOF
+    {
+      "index_patterns": ["application*"],
+      "order": -1,
+      "settings": {
+        "index.lifecycle.name": "application_policy",
+        "index.lifecycle.rollover_alias": "applicationalias",
+        "index.highlight.max_analyzed_offset": 10000000
+      }
+    }
+    EOF
+    curl -u elastic:PW_REPLACE -XPUT -H"Content-Type: application/json" --data @- \
+        http://elasticsearch-es-http.default.svc:9200/_ilm/policy/application_policy <<EOF
+    {
+      "policy": {
+        "phases": {
+          "hot": {
+            "actions": {
+              "rollover": {
+                "max_size": "10GB"
+              }
+            }
+          },
+          "delete": {
+            "min_age":"1d",
+            "actions": {
+              "delete": {}
+            }
+          }
+        }
+      }
+    }
+    EOF
+  kibana.sh: |
+    curl -u elastic:PW_REPLACE -XPOST http://kibana-kb-http.default.svc:5601/api/saved_objects/index-pattern/application* -H "Content-Type: application/json" -H "kbn-xsrf: true" -d'
+    {
+      "attributes": {
+            "title": "application*",
+            "timeFieldName": "@timestamp"
+      }
+    }'
+  run: |
+    cp /logging_setup/* /tmp
+    sed -i 's/PW_REPLACE/$ELPASSWORD/' /tmp/kibana.sh
+    sed -i 's/PW_REPLACE/$ELPASSWORD/' /tmp/elastic.sh
+    /bin/sh /tmp/kibana.sh
+    /bin/sh /tmp/elastic.sh
+apiVersion: v1
+---
+metadata:
+  labels:
+    app: logstash
+  name: logger-logstash
+kind: Service
+apiVersion: v1
+spec:
+  type: ClusterIP
+  ports:
+  - name: beats
+    targetPort: beats
+    protocol: TCP
+    port: 5044
+  selector:
+    app: logstash
+    release: logger
+---
+metadata:
+  labels:
+    app: logstash
+  name: logger-logstash
+kind: StatefulSet
+apiVersion: apps/v1
+spec:
+  serviceName: logger-logstash
+  replicas: 1
+  podManagementPolicy: OrderedReady
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      resources:
+        requests:
+          storage: 1Gi
+      accessModes:
+      - ReadWriteOnce
+  template:
+    metadata:
+      labels:
+        app: logstash
+        release: logger
+    spec:
+      initContainers: null
+      volumes:
+      - configMap:
+          name: logger-logstash-patterns
+        name: patterns
+      - configMap:
+          name: logger-logstash-pipeline
+        name: pipeline
+      terminationGracePeriodSeconds: 30
+      containers:
+      - readinessProbe:
+          initialDelaySeconds: 60
+          httpGet:
+            port: monitor
+            path: /
+        name: logstash
+        livenessProbe:
+          initialDelaySeconds: 60
+          httpGet:
+            port: monitor
+            path: /
+        image: docker.elastic.co/logstash/logstash:8.5.3
+        ports:
+        - containerPort: 9600
+          name: monitor
+          protocol: TCP
+        - containerPort: 5044
+          name: beats
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /usr/share/logstash/patterns
+          name: patterns
+        - mountPath: /usr/share/logstash/pipeline
+          name: pipeline
+        env:
+        - name: XPACK_MONITORING_ENABLED
+          value: "false"
+        - value: 'elastic'
+          name: ELPASSWORD
+        - value: 0.0.0.0
+          name: HTTP_HOST
+        - value: '9600'
+          name: HTTP_PORT
+        - value: "http://elasticsearch-es-http.default.svc.cluster.local"
+          name: ELASTICSEARCH_HOST
+        - value: '9200'
+          name: ELASTICSEARCH_PORT
+        - value: -Xmx2g -Xms1g
+          name: LS_JAVA_OPTS
+        - value: 'true'
+          name: CONFIG_RELOAD_AUTOMATIC
+        - value: /usr/share/logstash/pipeline
+          name: PATH_CONFIG
+        - value: '4096'
+          name: QUEUE_CHECKPOINT_WRITES
+        - value: 'true'
+          name: QUEUE_DRAIN
+        - value: 1gb
+          name: QUEUE_MAX_BYTES
+        - value: persisted
+          name: QUEUE_TYPE
+        - value: '100'
+          name: PIPELINE_BATCH_DELAY
+        - value: '250'
+          name: PIPELINE_BATCH_SIZE
+        - value: '4'
+          name: PIPELINE_WORKERS
+  selector:
+    matchLabels:
+      app: logstash
+      release: logger
+# TODO: un-comment this once elastic and kibana are running
+---
+metadata:
+  name: logging-setup
+kind: Job
+apiVersion: batch/v1
+spec:
+  template:
+    spec:
+      containers:
+      - name: logging-setup
+        image: centos
+        command:
+        - /bin/sh
+        args:
+        - /logging_setup/run
+        volumeMounts:
+        - mountPath: /logging_setup
+          name: config-volume
+        env:
+        - value: 'elastic'
+          name: ELPASSWORD
+      volumes:
+      - configMap:
+          name: logging-configurator
+        name: config-volume
+      restartPolicy: Never
+---  

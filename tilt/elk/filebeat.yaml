@@ -5,10 +5,10 @@ metadata:
 spec:
   type: filebeat
   version: 8.5.3
-  elasticsearchRef:
-    name: elasticsearch
-  kibanaRef:
-    name: kibana
+  # elasticsearchRef:
+  #   name: elasticsearch
+  # kibanaRef:
+  #   name: kibana
   config:
     filebeat:
       autodiscover:
@@ -21,6 +21,8 @@ spec:
               type: container
               paths:
               - /var/log/containers/*${data.kubernetes.container.id}.log
+    output.logstash:
+      hosts: ["logger-logstash.default.svc:5044"]
     processors:
     - add_cloud_metadata: {}
     - add_host_metadata: {}
