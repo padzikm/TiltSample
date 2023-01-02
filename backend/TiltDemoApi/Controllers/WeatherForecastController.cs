@@ -1,6 +1,8 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using OpenTelemetry;
 using TiltDemoApi.Configuration;
 using TiltDemoApi.Database;
 
@@ -38,24 +40,82 @@ public class WeatherForecastController : ControllerBase
     [HttpGet(Name = "GetWeatherForecast")]
     public IEnumerable<WeatherForecast> Get()
     {
-        return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+        ActivitySource activitySource = new ActivitySource("back1");
+        using (var ac = activitySource.StartActivity("important business"))
         {
-            Date = DateTime.Now.AddDays(index),
-            TemperatureC = Random.Shared.Next(-20, 55),
-            Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-        })
-        .ToArray();
+            ac.SetTag("cos", "val1");
+            _logger.LogInformation("testowe info");
+            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+                {
+                    Date = DateTime.Now.AddDays(index),
+                    TemperatureC = Random.Shared.Next(-20, 55),
+                    Summary = Summaries[Random.Shared.Next(Summaries.Length)]
+                })
+                .ToArray();
+        }
     }
 
-    [HttpGet("bla")]
-    public async Task<string> Get2()
+    [HttpGet("exl")]
+    public async Task<string> GetExL()
     {
+        throw new ApplicationException("sth went wrong");
+        // return t;
+        // return "Hello world16";
+    }
+    
+    [HttpGet("exr")]
+    public async Task<string> GetExR()
+    {
+        // Activity.Current?.SetTag("clientid", "test23");
+        // foreach (var tt in Activity.Current?.Tags)
+        // {
+        //  _logger.LogInformation($"{tt.Key}:{tt.Value}");   
+        // }
+        // _logger.LogInformation(Activity.Current?.Tags.ToString());
         var baseurl = _config["Back2_Base_Url"];
-        var url = $"{baseurl}/WeatherForecast/bla";
+        var url = $"{baseurl}/WeatherForecast/ex";
         var httpClient = _httpClientFactory.CreateClient();
         var res = await httpClient.GetAsync(url);
         var t = await res.Content.ReadAsStringAsync();
         return t;
+        // return "Hello world16";
+    }
+    
+    [HttpGet("bla")]
+    public async Task<string> Get2()
+    {
+        ActivitySource activitySource = new ActivitySource("back1");
+        using (var ac = activitySource.StartActivity("remote call"))
+        {
+            Baggage.SetBaggage("temp", "asdfadsf");
+            ac.SetTag("cos", "val2");
+            var baseurl = _config["Back2_Base_Url"];
+            var url = $"{baseurl}/WeatherForecast/bla";
+            var httpClient = _httpClientFactory.CreateClient();
+            var res = await httpClient.GetAsync(url);
+            var t = await res.Content.ReadAsStringAsync();
+            return t;
+        }
+        // return "Hello world16";
+    }
+    
+    [HttpGet("bla2")]
+    public async Task<string> Get3()
+    {
+        ActivitySource activitySource = new ActivitySource("back1");
+        using (var ac = activitySource.StartActivity("remote call"))
+        {
+            Baggage.SetBaggage("temp", "asdfadsf");
+            ac.SetTag("cos", "val2");
+            var baseurl = _config["Back2_Base_Url"];
+            var url = $"{baseurl}/WeatherForecast/bla";
+            var httpClient = _httpClientFactory.CreateClient();
+            var res = await httpClient.GetAsync(url);
+            var t = await res.Content.ReadAsStringAsync();
+            var res2 = await httpClient.GetAsync(url);
+            var t2 = await res.Content.ReadAsStringAsync();
+            return t + t2;
+        }
         // return "Hello world16";
     }
     
@@ -75,6 +135,28 @@ public class WeatherForecastController : ControllerBase
         var m = await _dbContext.FirstData.Where(p => p.Name == name).ToListAsync();
         
         return Ok(m);
+    }
+    
+    [HttpGet("savedb2/{age}")]
+    public async Task<string> SaveData2(int age)
+    {
+        var baseurl = _config["Back2_Base_Url"];
+        var url = $"{baseurl}/WeatherForecast/savedb/{age}";
+        var httpClient = _httpClientFactory.CreateClient();
+        var res = await httpClient.GetAsync(url);
+        var t = await res.Content.ReadAsStringAsync();
+        return t;
+    }
+    
+    [HttpGet("getdb2/{age}")]
+    public async Task<string> GetData2(int age)
+    {
+        var baseurl = _config["Back2_Base_Url"];
+        var url = $"{baseurl}/WeatherForecast/getdb/{age}";
+        var httpClient = _httpClientFactory.CreateClient();
+        var res = await httpClient.GetAsync(url);
+        var t = await res.Content.ReadAsStringAsync();
+        return t;
     }
     
     [HttpGet("config/inline")]

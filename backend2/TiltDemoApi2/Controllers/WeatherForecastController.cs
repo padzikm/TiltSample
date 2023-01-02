@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using OpenTelemetry;
 using TiltDemoApi2.Database;
 
 namespace TiltDemoApi2.Controllers;
@@ -26,18 +28,30 @@ public class WeatherForecastController : ControllerBase
     public IEnumerable<WeatherForecast> Get()
     {
         return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-        {
-            Date = DateTime.Now.AddDays(index),
-            TemperatureC = Random.Shared.Next(-20, 55),
-            Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-        })
-        .ToArray();
+                {
+                    Date = DateTime.Now.AddDays(index),
+                    TemperatureC = Random.Shared.Next(-20, 55),
+                    Summary = Summaries[Random.Shared.Next(Summaries.Length)]
+                })
+                .ToArray();
     }
 
     [HttpGet("bla")]
     public string Get2()
     {
-        return "Hello world22";
+        ActivitySource activitySource = new ActivitySource("back2");
+        using (var ac = activitySource.StartActivity("business"))
+        {
+            Console.WriteLine("baggage");
+            foreach (var item in Baggage.GetBaggage())
+            {
+                Console.WriteLine(item.Key);
+                Console.WriteLine(item.Value);
+                ac.SetTag(item.Key, item.Value);
+            }
+
+            return "Hello world22";
+        }
     }
 
     [HttpGet("savedb/{age}")]
@@ -56,5 +70,13 @@ public class WeatherForecastController : ControllerBase
         var m = await _dbContext.SecondData.Where(p => p.Age == age).ToListAsync();
         
         return Ok(m);
+    }
+
+    [HttpGet("ex")]
+    public async Task<string> GetExR()
+    {
+        throw new ApplicationException("sth went very wrong");
+        // return t;
+        // return "Hello world16";
     }
 }
