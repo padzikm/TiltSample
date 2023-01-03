@@ -42,7 +42,7 @@ public class WeatherForecastController : ControllerBase
         ActivitySource activitySource = new ActivitySource("back2");
         using (var ac = activitySource.StartActivity("business"))
         {
-            Console.WriteLine("baggage");
+            _logger.LogWarning("baggage");
             foreach (var item in Baggage.GetBaggage())
             {
                 Console.WriteLine(item.Key);

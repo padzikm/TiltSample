@@ -85,32 +85,32 @@ appBuilder.Services.AddOpenTelemetry()
                 break;
         }
     })
-    // .WithMetrics(builder =>
-    // {
-    //     // Metrics
+    .WithMetrics(builder =>
+    {
+        // Metrics
 
-    //     builder
-    //         // .AddRuntimeInstrumentation()
-    //         .AddHttpClientInstrumentation()
-    //         .AddAspNetCoreInstrumentation();
+        builder
+            // .AddRuntimeInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddAspNetCoreInstrumentation();
 
-    //     switch (metricsExporter)
-    //     {
-    //         // case "prometheus":
-    //         //     builder.AddPrometheusExporter();
-    //         //     break;
-    //         // case "otlp":
-    //         //     builder.AddOtlpExporter(otlpOptions =>
-    //         //     {
-    //         //         // Use IConfiguration directly for Otlp exporter endpoint option.
-    //         //         otlpOptions.Endpoint = new Uri(appBuilder.Configuration.GetValue<string>("Otlp:Endpoint"));
-    //         //     });
-    //         //     break;
-    //         default:
-    //             builder.AddConsoleExporter();
-    //             break;
-    //     }
-    // })
+        switch (metricsExporter)
+        {
+            case "prometheus":
+                builder.AddPrometheusExporter();
+                break;
+            // case "otlp":
+            //     builder.AddOtlpExporter(otlpOptions =>
+            //     {
+            //         // Use IConfiguration directly for Otlp exporter endpoint option.
+            //         otlpOptions.Endpoint = new Uri(appBuilder.Configuration.GetValue<string>("Otlp:Endpoint"));
+            //     });
+            //     break;
+            default:
+                builder.AddConsoleExporter();
+                break;
+        }
+    })
     .StartWithHost();
 
 // Clear default logging providers used by WebApplication host.
@@ -157,6 +157,7 @@ appBuilder.Services.AddDbContext<AppDbContext>(o => o.UseSqlServer(appBuilder.Co
 
 var app = appBuilder.Build();
 
+app.UseOpenTelemetryPrometheusScrapingEndpoint();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

@@ -113,7 +113,7 @@ public class WeatherForecastController : ControllerBase
             var res = await httpClient.GetAsync(url);
             var t = await res.Content.ReadAsStringAsync();
             var res2 = await httpClient.GetAsync(url);
-            var t2 = await res.Content.ReadAsStringAsync();
+            var t2 = await res2.Content.ReadAsStringAsync();
             return t + t2;
         }
         // return "Hello world16";
