@@ -12,10 +12,12 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
 using Serilog.Enrichers.Span;
+using Serilog.Exceptions;
 using Serilog.Formatting.Compact;
 using TiltDemoApi;
 
 Log.Logger = new LoggerConfiguration()
+    .Enrich.WithExceptionDetails()
     .Enrich.WithSpan()
     .Enrich.WithMachineName()
     .Enrich.WithProcessId()
