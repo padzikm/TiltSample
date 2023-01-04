@@ -38,8 +38,8 @@ data:
                 ilm_rollover_alias => "applicationalias"
                 ilm_pattern => "{now/d}-0001"
                 ilm_policy => "application_policy"
+            }
         }
-      }
     }
 apiVersion: v1
 ---

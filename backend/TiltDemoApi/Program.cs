@@ -10,7 +10,21 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using Serilog;
+using Serilog.Enrichers.Span;
+using Serilog.Formatting.Compact;
 using TiltDemoApi;
+
+Log.Logger = new LoggerConfiguration()
+    .Enrich.WithSpan()
+    .Enrich.WithMachineName()
+    .Enrich.WithProcessId()
+    .Enrich.WithProcessName()
+    .Enrich.WithThreadId()
+    .Enrich.WithThreadName()
+    .Enrich.WithClientIp()
+    .WriteTo.Console(new CompactJsonFormatter())
+    .CreateLogger();
 
 var appBuilder = WebApplication.CreateBuilder(args);
 
@@ -113,32 +127,34 @@ appBuilder.Services.AddOpenTelemetry()
     })
     .StartWithHost();
 
+appBuilder.Host.UseSerilog();
+
 // Clear default logging providers used by WebApplication host.
-appBuilder.Logging.ClearProviders();
-
-// Configure OpenTelemetry Logging.
-appBuilder.Logging.AddOpenTelemetry(options =>
-{
-    // Note: See appsettings.json Logging:OpenTelemetry section for configuration.
-
-    var resourceBuilder = ResourceBuilder.CreateDefault();
-    configureResource(resourceBuilder);
-    options.SetResourceBuilder(resourceBuilder);
-
-    switch (logExporter)
-    {
-        // case "otlp":
-        //     options.AddOtlpExporter(otlpOptions =>
-        //     {
-        //         // Use IConfiguration directly for Otlp exporter endpoint option.
-        //         otlpOptions.Endpoint = new Uri(appBuilder.Configuration.GetValue<string>("Otlp:Endpoint"));
-        //     });
-        //     break;
-        default:
-            options.AddConsoleExporter();
-            break;
-    }
-});
+// appBuilder.Logging.ClearProviders();
+//
+// // Configure OpenTelemetry Logging.
+// appBuilder.Logging.AddOpenTelemetry(options =>
+// {
+//     // Note: See appsettings.json Logging:OpenTelemetry section for configuration.
+//
+//     var resourceBuilder = ResourceBuilder.CreateDefault();
+//     configureResource(resourceBuilder);
+//     options.SetResourceBuilder(resourceBuilder);
+//
+//     switch (logExporter)
+//     {
+//         // case "otlp":
+//         //     options.AddOtlpExporter(otlpOptions =>
+//         //     {
+//         //         // Use IConfiguration directly for Otlp exporter endpoint option.
+//         //         otlpOptions.Endpoint = new Uri(appBuilder.Configuration.GetValue<string>("Otlp:Endpoint"));
+//         //     });
+//         //     break;
+//         default:
+//             options.AddConsoleExporter();
+//             break;
+//     }
+// });
 
 // Add services to the container.
 
