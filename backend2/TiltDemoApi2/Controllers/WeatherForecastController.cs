@@ -1,7 +1,9 @@
 using System.Diagnostics;
+using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OpenTelemetry;
+using TiltDemoApi.MsgContracts;
 using TiltDemoApi2.Database;
 
 namespace TiltDemoApi2.Controllers;

@@ -1,10 +1,12 @@
 using System.Diagnostics;
+using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using OpenTelemetry;
 using TiltDemoApi.Configuration;
 using TiltDemoApi.Database;
+using TiltDemoApi.MsgContracts;
 
 namespace TiltDemoApi.Controllers;
 
@@ -24,9 +26,10 @@ public class WeatherForecastController : ControllerBase
     private readonly IOptions<ConfigBack2> _configback2;
     private readonly IOptions<ConfigFront> _configfront;
     private readonly IOptions<ConfigMap> _configmap;
+    private readonly IPublishEndpoint _bus;
 
     public WeatherForecastController(ILogger<WeatherForecastController> logger, IHttpClientFactory httpClientFactory, AppDbContext dbContext, IConfiguration config,
-        IOptions<ConfigBack2> configback2, IOptions<ConfigFront> configfront, IOptions<ConfigMap> configmap)
+        IOptions<ConfigBack2> configback2, IOptions<ConfigFront> configfront, IOptions<ConfigMap> configmap, IPublishEndpoint bus)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -35,6 +38,7 @@ public class WeatherForecastController : ControllerBase
         _configback2 = configback2;
         _configfront = configfront;
         _configmap = configmap;
+        _bus = bus;
     }
 
     [HttpGet(Name = "GetWeatherForecast")]
@@ -190,5 +194,13 @@ public class WeatherForecastController : ControllerBase
         Console.WriteLine("cokolwiek");
         
         return cfg == null ? Ok("null") : Ok(cfg);
+    }
+    
+    [HttpGet("user/{age}")]
+    public async Task<ActionResult> User(int age)
+    {
+        var u = new CreateUser() { Age = age };
+        await _bus.Publish<CreateUser>(u);
+        return Ok();
     }
 }

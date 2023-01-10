@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using TiltDemoApi2.Database;
 using System.Reflection;
+using MassTransit;
 using OpenTelemetry;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Instrumentation.AspNetCore;
@@ -12,6 +13,8 @@ using Serilog;
 using Serilog.Enrichers.Span;
 using Serilog.Exceptions;
 using Serilog.Formatting.Compact;
+using TiltDemoApi.MsgContracts;
+using TiltDemoApi2.Msgs;
 
 Log.Logger = new LoggerConfiguration()
     .Enrich.WithExceptionDetails()
@@ -22,7 +25,8 @@ Log.Logger = new LoggerConfiguration()
     .Enrich.WithThreadId()
     .Enrich.WithThreadName()
     .Enrich.WithClientIp()
-    .WriteTo.Console(new CompactJsonFormatter())
+    // .WriteTo.Console(new CompactJsonFormatter())
+    .WriteTo.Console()
     .CreateLogger();
 
 var appBuilder = WebApplication.CreateBuilder(args);
@@ -163,6 +167,22 @@ appBuilder.Services.AddEndpointsApiExplorer();
 appBuilder.Services.AddSwaggerGen();
 appBuilder.Services.AddDbContext<AppDbContext>(o => o.UseSqlServer(appBuilder.Configuration.GetConnectionString("Back2Db")));
 appBuilder.Services.AddCors();
+
+appBuilder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<UserHandler2>();
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host("rabbitmq-0.rabbitmq-headless.msgbroker", "/", h =>
+        {
+            h.Username("guest");
+            h.Password("guest");
+        });
+
+        cfg.ConfigureEndpoints(context);
+    });
+});
 
 var app = appBuilder.Build();
 

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using TiltDemoApi.Configuration;
 using TiltDemoApi.Database;
 using System.Reflection;
+using MassTransit;
 using OpenTelemetry;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Instrumentation.AspNetCore;
@@ -15,6 +16,7 @@ using Serilog.Enrichers.Span;
 using Serilog.Exceptions;
 using Serilog.Formatting.Compact;
 using TiltDemoApi;
+using TiltDemoApi.Msgs;
 
 Log.Logger = new LoggerConfiguration()
     .Enrich.WithExceptionDetails()
@@ -25,7 +27,8 @@ Log.Logger = new LoggerConfiguration()
     .Enrich.WithThreadId()
     .Enrich.WithThreadName()
     .Enrich.WithClientIp()
-    .WriteTo.Console(new CompactJsonFormatter())
+    // .WriteTo.Console(new CompactJsonFormatter())
+    .WriteTo.Console()
     .CreateLogger();
 
 var appBuilder = WebApplication.CreateBuilder(args);
@@ -171,6 +174,22 @@ appBuilder.Services.AddOptions<ConfigFront>().Bind(appBuilder.Configuration.GetS
 appBuilder.Services.AddOptions<ConfigMap>().Bind(appBuilder.Configuration.GetSection(ConfigMap.Key)).ValidateDataAnnotations().ValidateOnStart();
 
 appBuilder.Services.AddDbContext<AppDbContext>(o => o.UseSqlServer(appBuilder.Configuration.GetConnectionString("Back1Db")));
+
+appBuilder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<UserHandler>();
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host("rabbitmq-0.rabbitmq-headless.msgbroker", "/", h =>
+        {
+            h.Username("guest");
+            h.Password("guest");
+        });
+
+        cfg.ConfigureEndpoints(context);
+    });
+});
 
 var app = appBuilder.Build();
 

@@ -25,6 +25,8 @@ k8s_yaml('elk/kibana.yaml')
 k8s_yaml('elk/filebeat.yaml')
 k8s_yaml('elk/logstash.yaml')
 
+# docker_compose('./otel/docker-compose.yaml')
+
 k8s_yaml(kustomize('.'))
 
 docker_build(
