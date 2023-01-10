@@ -106,7 +106,7 @@ appBuilder.Services.AddOpenTelemetry()
         // Metrics
 
         builder
-            // .AddRuntimeInstrumentation()
+            .AddRuntimeInstrumentation()
             .AddHttpClientInstrumentation()
             .AddAspNetCoreInstrumentation();
 

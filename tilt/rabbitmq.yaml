@@ -10,8 +10,8 @@ metadata:
   namespace: msgbroker
 type: Opaque
 stringData:
-  rabbitmq_password: "quest"
-  rabbitmq_user: "quest"
+  rabbitmq_password: "guest"
+  rabbitmq_user: "guest"
 ---
 apiVersion: v1
 kind: Service
