@@ -93,7 +93,7 @@ appBuilder.Services.AddOpenTelemetry()
             //     });
             //     break;
 
-            default:
+            case "console":
                 builder.AddConsoleExporter();
                 break;
         }
@@ -119,7 +119,7 @@ appBuilder.Services.AddOpenTelemetry()
             //         otlpOptions.Endpoint = new Uri(appBuilder.Configuration.GetValue<string>("Otlp:Endpoint"));
             //     });
             //     break;
-            default:
+            case "console":
                 builder.AddConsoleExporter();
                 break;
         }
@@ -166,7 +166,8 @@ appBuilder.Services.AddCors();
 
 var app = appBuilder.Build();
 
-app.UseOpenTelemetryPrometheusScrapingEndpoint();
+if(metricsExporter == "prometheus")
+    app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
