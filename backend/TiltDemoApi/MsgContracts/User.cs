@@ -7,5 +7,7 @@ public class CreateUser
 
 public class CreatedUser
 {
+    public int Age { get; set; }
+    
     public string Name { get; set; }
 }

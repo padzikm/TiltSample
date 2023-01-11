@@ -29,7 +29,7 @@ public class UserHandler2 : IConsumer<CreateUser>
             await _dbContext.SaveChangesAsync();
             _logger.LogInformation("create user saved");
             var n = $"name{context.Message.Age}";
-            var u = new CreatedUser() { Name = n };
+            var u = new CreatedUser() { Name = n, Age = context.Message.Age };
             await context.Publish<CreatedUser>(u);
             _logger.LogInformation("created user published");
         }
