@@ -41,7 +41,7 @@ public class WeatherForecastController : ControllerBase
     [HttpGet("bla")]
     public string Get2()
     {
-        ActivitySource activitySource = new ActivitySource("back2");
+        ActivitySource activitySource = new ActivitySource("back2.bla");
         using (var ac = activitySource.StartActivity("business"))
         {
             _logger.LogWarning("baggage");

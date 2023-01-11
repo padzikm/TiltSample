@@ -44,7 +44,7 @@ public class WeatherForecastController : ControllerBase
     [HttpGet(Name = "GetWeatherForecast")]
     public IEnumerable<WeatherForecast> Get()
     {
-        ActivitySource activitySource = new ActivitySource("back1");
+        ActivitySource activitySource = new ActivitySource("back1.getweather");
         using (var ac = activitySource.StartActivity("important business"))
         {
             ac.SetTag("cos", "val1");
@@ -88,7 +88,7 @@ public class WeatherForecastController : ControllerBase
     [HttpGet("bla")]
     public async Task<string> Get2()
     {
-        ActivitySource activitySource = new ActivitySource("back1");
+        ActivitySource activitySource = new ActivitySource("back1.bla");
         using (var ac = activitySource.StartActivity("remote call"))
         {
             Baggage.SetBaggage("temp", "asdfadsf");
@@ -106,7 +106,7 @@ public class WeatherForecastController : ControllerBase
     [HttpGet("bla2")]
     public async Task<string> Get3()
     {
-        ActivitySource activitySource = new ActivitySource("back1");
+        ActivitySource activitySource = new ActivitySource("back1.bla2");
         using (var ac = activitySource.StartActivity("remote call"))
         {
             Baggage.SetBaggage("temp", "asdfadsf");

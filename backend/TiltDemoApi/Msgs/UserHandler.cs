@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using MassTransit;
 using TiltDemoApi.Database;
 using TiltDemoApi.MsgContracts;
@@ -17,12 +18,16 @@ public class UserHandler : IConsumer<CreatedUser>
 
     public async Task Consume(ConsumeContext<CreatedUser> context)
     {
-        _logger.LogInformation("created user received");
-        _logger.LogInformation(context.Message.Name);
+        ActivitySource activitySource = new ActivitySource("back1.msgs");
+        using (var ac = activitySource.StartActivity("CreatedUser handler"))
+        {
+            _logger.LogInformation("created user received");
+            _logger.LogInformation(context.Message.Name);
 
-        var d = new Model() { Name = context.Message.Name, Date = DateTime.Now };
-        _dbContext.FirstData.Add(d);
-        await _dbContext.SaveChangesAsync();
-        _logger.LogInformation("created user saved");
+            var d = new Model() { Name = context.Message.Name, Date = DateTime.Now };
+            _dbContext.FirstData.Add(d);
+            await _dbContext.SaveChangesAsync();
+            _logger.LogInformation("created user saved");
+        }
     }
 }

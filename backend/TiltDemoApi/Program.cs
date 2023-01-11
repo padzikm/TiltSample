@@ -63,7 +63,7 @@ appBuilder.Services.AddOpenTelemetry()
             .AddSqlClientInstrumentation()
             // .AddMassTransitInstrumentation()
             .AddSource("MassTransit")
-            .AddSource("back1");
+            .AddSource("back1.*");
 
         // Use IConfiguration binding for AspNetCore instrumentation options.
         appBuilder.Services.Configure<AspNetCoreInstrumentationOptions>(appBuilder.Configuration.GetSection("AspNetCoreInstrumentation"));
