@@ -341,7 +341,7 @@
       </g>
     </svg>
 
-    <span>{{ title }} app is running!</span>
+    <span (mouseover)='over()'>{{ title }} app is running!</span>
 
     <svg id="rocket-smoke" xmlns="http://www.w3.org/2000/svg" width="516.119" height="1083.632" viewBox="0 0 516.119 1083.632">
       <title>Rocket Ship Smoke</title>
@@ -385,7 +385,15 @@
     </a>
 
   </div>
-  <button (click)="clickme()">klik me!</button>
+  <button (click)="bla()">bla</button>
+  <button (click)="bla2()">bla2</button>
+  <button (click)="msg()">msg</button>
+  <button (click)="sth2()">sth2</button>
+  <button (click)="ex()">ex</button>
+  <button (click)="exl()">exl</button>
+  <button (click)="exr()">exr</button>
+  <button (click)="sth()">sth</button>
+  <button (click)="help()">help</button>
   <!-- Next Steps -->
   <h2>Next Steps</h2>
   <p>What do you want to do next with your app?</p>

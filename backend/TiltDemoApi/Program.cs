@@ -27,8 +27,8 @@ Log.Logger = new LoggerConfiguration()
     .Enrich.WithThreadId()
     .Enrich.WithThreadName()
     .Enrich.WithClientIp()
-    // .WriteTo.Console(new CompactJsonFormatter())
-    .WriteTo.Console()
+    .WriteTo.Console(new CompactJsonFormatter())
+    // .WriteTo.Console()
     .CreateLogger();
 
 var appBuilder = WebApplication.CreateBuilder(args);
@@ -62,6 +62,7 @@ appBuilder.Services.AddOpenTelemetry()
             .AddAspNetCoreInstrumentation()
             .AddSqlClientInstrumentation()
             // .AddMassTransitInstrumentation()
+            // .AddEntityFrameworkCoreInstrumentation()
             .AddSource("MassTransit")
             .AddSource("back1.*");
 
@@ -111,6 +112,7 @@ appBuilder.Services.AddOpenTelemetry()
 
         builder
             .AddRuntimeInstrumentation()
+            .AddProcessInstrumentation()
             .AddHttpClientInstrumentation()
             .AddAspNetCoreInstrumentation();
 

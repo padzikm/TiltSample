@@ -1,0 +1,25 @@
+receivers:
+  otlp:
+    protocols:
+      http:
+        include_metadata: true
+        cors:
+          allowed_origins:
+            - http://localhost:8080
+          # allowed_headers:
+            # - "*"
+          max_age: 7200
+exporters:
+  otlp:
+    endpoint: "jaeger:4317"
+    tls:
+      insecure: true
+  logging:
+processors:
+  batch:
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [otlp]
+      processors: [batch]
