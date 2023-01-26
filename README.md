@@ -9,6 +9,14 @@ make sure these ports are free: 8080, 51437, 5672, 15672, 5601, 22000, 22001
 # how to run
 cd tilt && tilt up
 press space to open ui view (best view is detailed - switch in top left corner in tilt ui)
+# how to work with
+changes in code will be automatically detected by tilt - changed service will be rebuilded and redeployed on file save
+save changed source code and observe tilt ui tab in browser:
+gray means rebuilding and redeploying
+green means everything is running correctly
+red means there is error
+if tilt ui shows error navigate to errored task in tilt ui to see error details
+if you don't know what to do refresh errored task in tilt ui for rebuilding or redeploying
 # what services are available
 http://localhost:8080/front - frontend (folder frontend)
 http://localhost:8080/back1 - microservice back1 (folder backend)
