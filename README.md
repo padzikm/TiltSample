@@ -15,7 +15,7 @@ save changed source code and observe tilt ui tab in browser:
 gray means rebuilding and redeploying
 green means everything is running correctly
 red means there is error
-if tilt ui shows error navigate to errored task in tilt ui to see error details
+if tilt ui shows error navigate to errored task in tilt ui (in detailed view mode) to see error details
 if you don't know what to do refresh errored task in tilt ui for rebuilding or redeploying
 # what services are available
 http://localhost:8080/front - frontend (folder frontend)
