@@ -9,14 +9,14 @@ os.putenv('BACK1_URL', '{entryhttpurl}/back1'.format(entryhttpurl=entryhttpurl))
 local_resource(
     'pkgs-front',
     'npm install',
-    labels=['front', 'app1']
+    labels=['front']
 )
 
 local_resource(
     'create-dist-front',
     'mkdir -p ./dist',
     resource_deps=['pkgs-front'],
-    labels=['front', 'app1']
+    labels=['front']
 )
 
 local_resource(
@@ -24,14 +24,14 @@ local_resource(
     """if [ -f dist/frontend/stats.json ]; then if [ "$(grep -c '"errorsCount":0' dist/frontend/stats.json)" = "1" ]; then echo 'build succeeded'; else echo 'build failed'; exit 1; fi; else echo 'stats not found'; fi""",
     deps=['dist/frontend/stats.json'],
     resource_deps=['create-dist-front'],
-    labels=['front', 'app1']
+    labels=['front']
 )
 
 local_resource(
     'build-front',
     serve_cmd='npm run build:tilt',
     resource_deps=['create-dist-front'],
-    labels=['front', 'app1']
+    labels=['front']
 )
 
 local_resource(
@@ -39,7 +39,7 @@ local_resource(
     'cp ./nginx.conf ./dist',
     deps=['nginx.conf'],
     resource_deps=['create-dist-front'],
-    labels=['front', 'app1']
+    labels=['front']
 )
 
 docker_build_with_restart(
@@ -53,4 +53,4 @@ docker_build_with_restart(
 )
 
 k8s_yaml(kustomize('.'), allow_duplicates=True)
-k8s_resource('hello-tilt-front', resource_deps=['script-front'], labels=['front', 'app1'])
+k8s_resource('hello-tilt-front', resource_deps=['script-front'], labels=['front'])

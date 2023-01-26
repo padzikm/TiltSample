@@ -15,7 +15,7 @@ os.putenv('MSSQLCONNECTIONSTRING', connstring)
 local_resource(
     'tool-restore-back',
     'dotnet tool restore',
-    labels=['back', 'app1']
+    labels=['back1']
 )
 
 local_resource(
@@ -24,21 +24,21 @@ local_resource(
     deps=['TiltDemoApi'],
     ignore=['TiltDemoApi/obj', 'TiltDemoApi/bin'],
     resource_deps=['tool-restore-back'],
-    labels=['back', 'app1']
+    labels=['back1']
 )
 
 local_resource(
     'script-back',
     'cp ./script.sh ./out/script.sh',
     resource_deps=['build-back'],
-    labels=['back', 'app1']
+    labels=['back1']
 )
 
 local_resource(
     'db-update-back',
     'cd TiltDemoApi && dotnet ef database update',
     resource_deps=['script-back', 'mssql'],
-    labels=['back', 'app1']
+    labels=['back1']
 )
 
 docker_build_with_restart(
@@ -53,4 +53,4 @@ docker_build_with_restart(
 )
 
 k8s_yaml(kustomize('.'), allow_duplicates=True)
-k8s_resource('hello-tilt-back1', port_forwards=['22000:22'], resource_deps=['db-update-back'], labels=['back', 'app1'])
+k8s_resource('hello-tilt-back1', port_forwards=['22000:22'], resource_deps=['db-update-back'], labels=['back1'])
