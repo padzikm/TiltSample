@@ -78,7 +78,5 @@ public class WeatherForecastController : ControllerBase
     public async Task<string> GetExR()
     {
         throw new ApplicationException("sth went very wrong");
-        // return t;
-        // return "Hello world16";
     }
 }

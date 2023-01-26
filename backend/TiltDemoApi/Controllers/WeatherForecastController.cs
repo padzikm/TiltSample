@@ -27,9 +27,10 @@ public class WeatherForecastController : ControllerBase
     private readonly IOptions<ConfigFront> _configfront;
     private readonly IOptions<ConfigMap> _configmap;
     private readonly IPublishEndpoint _bus;
+    private readonly IMessageScheduler _msgScheduler;
 
     public WeatherForecastController(ILogger<WeatherForecastController> logger, IHttpClientFactory httpClientFactory, AppDbContext dbContext, IConfiguration config,
-        IOptions<ConfigBack2> configback2, IOptions<ConfigFront> configfront, IOptions<ConfigMap> configmap, IPublishEndpoint bus)
+        IOptions<ConfigBack2> configback2, IOptions<ConfigFront> configfront, IOptions<ConfigMap> configmap, IPublishEndpoint bus, IMessageScheduler msgScheduler)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -39,6 +40,7 @@ public class WeatherForecastController : ControllerBase
         _configfront = configfront;
         _configmap = configmap;
         _bus = bus;
+        _msgScheduler = msgScheduler;
     }
 
     [HttpGet(Name = "GetWeatherForecast")]
@@ -197,10 +199,18 @@ public class WeatherForecastController : ControllerBase
     }
     
     [HttpGet("user/{age}")]
-    public async Task<ActionResult> User(int age)
+    public async Task<ActionResult> UserEndpoint(int age)
     {
         var u = new CreateUser() { Age = age };
         await _bus.Publish<CreateUser>(u);
+        return Ok();
+    }
+    
+    [HttpGet("userdelay/{delay}/{age}")]
+    public async Task<ActionResult> UserEndpointDelayed(int delay, int age)
+    {
+        var u = new CreateUser() { Age = age };
+        await _msgScheduler.SchedulePublish<CreateUser>(TimeSpan.FromSeconds(delay), u);
         return Ok();
     }
 }

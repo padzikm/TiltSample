@@ -59,8 +59,6 @@ appBuilder.Services.AddOpenTelemetry()
             .AddHttpClientInstrumentation()
             .AddAspNetCoreInstrumentation()
             .AddSqlClientInstrumentation()
-            // .AddEntityFrameworkCoreInstrumentation()
-            // .AddMassTransitInstrumentation()
             .AddSource("MassTransit")
             .AddSource("back2.*");
 
@@ -81,24 +79,13 @@ appBuilder.Services.AddOpenTelemetry()
                     services.AddHttpClient("JaegerExporter", configureClient: (client) => client.DefaultRequestHeaders.Add("X-MyCustomHeader", "value"));
                 });
                 break;
-
-            // case "zipkin":
-            //     builder.AddZipkinExporter();
-
-            //     builder.ConfigureServices(services =>
-            //     {
-            //         // Use IConfiguration binding for Zipkin exporter options.
-            //         services.Configure<ZipkinExporterOptions>(appBuilder.Configuration.GetSection("Zipkin"));
-            //     });
-            //     break;
-
-            // case "otlp":
-            //     builder.AddOtlpExporter(otlpOptions =>
-            //     {
-            //         // Use IConfiguration directly for Otlp exporter endpoint option.
-            //         otlpOptions.Endpoint = new Uri(appBuilder.Configuration.GetValue<string>("Otlp:Endpoint"));
-            //     });
-            //     break;
+            case "otlp":
+                builder.AddOtlpExporter(otlpOptions =>
+                {
+                    // Use IConfiguration directly for Otlp exporter endpoint option.
+                    otlpOptions.Endpoint = new Uri(appBuilder.Configuration.GetValue<string>("Otlp:Endpoint"));
+                });
+                break;
 
             case "console":
                 builder.AddConsoleExporter();
@@ -120,13 +107,13 @@ appBuilder.Services.AddOpenTelemetry()
             case "prometheus":
                 builder.AddPrometheusExporter();
                 break;
-            // case "otlp":
-            //     builder.AddOtlpExporter(otlpOptions =>
-            //     {
-            //         // Use IConfiguration directly for Otlp exporter endpoint option.
-            //         otlpOptions.Endpoint = new Uri(appBuilder.Configuration.GetValue<string>("Otlp:Endpoint"));
-            //     });
-            //     break;
+            case "otlp":
+                builder.AddOtlpExporter(otlpOptions =>
+                {
+                    // Use IConfiguration directly for Otlp exporter endpoint option.
+                    otlpOptions.Endpoint = new Uri(appBuilder.Configuration.GetValue<string>("Otlp:Endpoint"));
+                });
+                break;
             case "console":
                 builder.AddConsoleExporter();
                 break;
@@ -175,6 +162,8 @@ appBuilder.Services.AddCors();
 appBuilder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<UserHandler2>();
+    
+    x.AddDelayedMessageScheduler();
 
     x.UsingRabbitMq((context, cfg) =>
     {

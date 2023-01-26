@@ -176,6 +176,32 @@ export class AppComponent {
     });
   }
 
+  delayedMsg() {
+    this.tracer.startActiveSpan('delayedMsg', span => {
+      this.enhanceWithClientId(span);
+      span.addEvent('fetch');
+
+      let a = Math.ceil(Math.random() * 100);
+      let apic = () => this.delay(5).then(() => fetch('__BACK1_URL__/WeatherForecast/userdelay/10/' + a));
+      this.apiCall('delayedMsg', apic).then(this.checkResponse).then(r => r.text()).then(v => {
+        this.tracer.startActiveSpan('successdelaymsg', span => {
+          this.enhanceWithClientId(span);
+          span.addEvent('fetchsuccess');
+          span.end();
+        });
+      }).catch(err => {
+        this.tracer.startActiveSpan('errordelaymsg', span => {
+          this.enhanceWithClientId(span);
+          span.recordException(err as Exception);
+          span.setStatus({ code: SpanStatusCode.ERROR });
+          span.end();
+        });
+      });
+
+      span.end();
+    });
+  }
+
   exl() {
     this.tracer.startActiveSpan('exl', span => {
       this.enhanceWithClientId(span);
