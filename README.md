@@ -1,5 +1,5 @@
 # what to install
-docker, k3d, kubectl, terraform, tilt
+docker, k3d, kubectl, terraform, tilt, dotnet 6, nodejs
 # how to prepare
 make sure these ports are free: 8080, 51437, 5672, 15672, 5601, 22000, 22001
 # how to setup on linux

@@ -3,14 +3,6 @@
 # For more on Extensions, see: https://docs.tilt.dev/extensions.html
 load('ext://restart_process', 'docker_build_with_restart')
 
-# Records the current time, then kicks off a server update.
-# Normally, you would let Tilt do deploys automatically, but this
-# shows you how to set up a custom workflow that measures it.
-# local_resource(
-#     'deploy',
-#     'python ./record-start-time.py',
-#     deps=['./record-start-time.py'],
-# )
 buildconf = os.getenv('buildconfig')
 riderver = os.getenv('riderver')
 mssqlserver = os.getenv('mssqlserver')

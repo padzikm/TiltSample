@@ -3,24 +3,12 @@
 # For more on Extensions, see: https://docs.tilt.dev/extensions.html
 load('ext://restart_process', 'docker_build_with_restart')
 
-# Records the current time, then kicks off a server update.
-# Normally, you would let Tilt do deploys automatically, but this
-# shows you how to set up a custom workflow that measures it.
-# local_resource(
-#     'deploy',
-#     'python ./record-start-time.py',
-#     deps=['./record-start-time.py'],
-# )
-
 entryhttpurl = os.getenv('entryhttpurl')
 os.putenv('BACK1_URL', '{entryhttpurl}/back1'.format(entryhttpurl=entryhttpurl))
 
 local_resource(
     'pkgs-front',
     'npm install',
-    # deps=['package-lock.json'],
-    # ignore=['TiltDemoApi/obj', 'TiltDemoApi/bin'],
-    # resource_deps=['deploy'],
     labels=['front', 'app1']
 )
 
@@ -35,17 +23,13 @@ local_resource(
     'validate-build-front',
     """if [ -f dist/frontend/stats.json ]; then if [ "$(grep -c '"errorsCount":0' dist/frontend/stats.json)" = "1" ]; then echo 'build succeeded'; else echo 'build failed'; exit 1; fi; else echo 'stats not found'; fi""",
     deps=['dist/frontend/stats.json'],
-    # ignore=['TiltDemoApi/obj', 'TiltDemoApi/bin'],
     resource_deps=['create-dist-front'],
     labels=['front', 'app1']
 )
 
 local_resource(
     'build-front',
-    # 'echo success',
     serve_cmd='npm run build:tilt',
-    # deps=['src'],
-    # ignore=['TiltDemoApi/obj', 'TiltDemoApi/bin'],
     resource_deps=['create-dist-front'],
     labels=['front', 'app1']
 )
@@ -62,30 +46,11 @@ docker_build_with_restart(
     'hello-tilt-front',
     'dist',
     entrypoint=["/docker-entrypoint.sh", "nginx", "-g", "daemon off;"],
-    # entrypoint=["/app/script.sh"],
     dockerfile='Dockerfile',
     live_update=[
         sync('dist/frontend', '/usr/share/nginx/html'),
     ],
 )
 
-# docker_build(
-#     'hello-tilt-front',
-#     '.',
-#     # entrypoint='npm run start',
-#     dockerfile='Dockerfile.serve',
-#     live_update=[
-#         sync('src', '/app/src'),
-#         sync('angular.json', '/app/'),
-#         sync('package.json', '/app/'),
-#         sync('package-lock.json', '/app/'),
-#         sync('tsconfig.app.json', '/app/'),
-#         sync('tsconfig.json', '/app/'),
-#         run('cd /app && npm install', trigger='package-lock.json')
-#     ],
-#     only=['src', 'angular.json', 'Dockerfile.serve', 'package-lock.json', 'package.json', 'tsconfig.app.json', 'tsconfig.json']
-# )
-
 k8s_yaml(kustomize('.'), allow_duplicates=True)
 k8s_resource('hello-tilt-front', resource_deps=['script-front'], labels=['front', 'app1'])
-# k8s_resource('hello-tilt-front', port_forwards=['4200:4200'])
