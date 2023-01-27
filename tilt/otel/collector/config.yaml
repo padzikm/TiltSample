@@ -15,11 +15,17 @@ exporters:
     tls:
       insecure: true
   logging:
+  prometheus:
+    endpoint: "otel-collector:9464"
 processors:
   batch:
 service:
   pipelines:
     traces:
       receivers: [otlp]
-      exporters: [otlp]
       processors: [batch]
+      exporters: [otlp]
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [prometheus]

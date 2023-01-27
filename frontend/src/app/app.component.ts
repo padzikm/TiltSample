@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import opentelemetry, { Exception, SpanStatusCode, ROOT_CONTEXT, createContextKey, Span } from "@opentelemetry/api";
+import opentelemetry, { Exception, SpanStatusCode, ROOT_CONTEXT, createContextKey, Span, trace, Attributes, Counter } from "@opentelemetry/api";
 
 @Component({
   selector: 'app-root',
@@ -10,11 +10,16 @@ export class AppComponent {
   title = 'frontend';
   tracer;
   span: any = undefined;
+  counter: Counter<Attributes>;
+  clientid;
 
   constructor() {
     this.tracer = opentelemetry.trace.getTracer(
       'example-tracer2'
     );
+    const meter = opentelemetry.metrics.getMeter('example-meter');
+    this.counter = meter.createCounter('front_ex_count');
+    this.clientid = opentelemetry.context.active().getValue(createContextKey('clientid')) as string;
   }
 
   ngOnInit() {
@@ -33,8 +38,8 @@ export class AppComponent {
   }
 
   enhanceWithClientId(s: Span){
-    let clientid = opentelemetry.context.active().getValue(createContextKey('clientid')) as string;
-    s.setAttribute('clientId', clientid);
+    // let clientid = opentelemetry.context.active().getValue(createContextKey('clientid')) as string;
+    s.setAttribute('clientId', this.clientid);
   }
 
   apiCall<T>(name: string, fn: () => T): T {
@@ -95,6 +100,7 @@ export class AppComponent {
           span.setStatus({ code: SpanStatusCode.ERROR });
           span.end();
         });
+        this.counter.add(1, {clientId: this.clientid});
       }
 
       span.end();
@@ -119,6 +125,7 @@ export class AppComponent {
           span.setStatus({ code: SpanStatusCode.ERROR });
           span.end();
         });
+        this.counter.add(1, {clientId: this.clientid});
       });
 
       span.end();
@@ -144,6 +151,7 @@ export class AppComponent {
           span.setStatus({ code: SpanStatusCode.ERROR });
           span.end();
         });
+        this.counter.add(1, {clientId: this.clientid});
       });
 
       span.end();
@@ -170,6 +178,7 @@ export class AppComponent {
           span.setStatus({ code: SpanStatusCode.ERROR });
           span.end();
         });
+        this.counter.add(1, {clientId: this.clientid});
       });
 
       span.end();
@@ -196,6 +205,7 @@ export class AppComponent {
           span.setStatus({ code: SpanStatusCode.ERROR });
           span.end();
         });
+        this.counter.add(1, {clientId: this.clientid});
       });
 
       span.end();
@@ -221,6 +231,7 @@ export class AppComponent {
           span.setStatus({ code: SpanStatusCode.ERROR });
           span.end();
         });
+        this.counter.add(1, {clientId: this.clientid});
       });
 
       span.end();
@@ -246,6 +257,7 @@ export class AppComponent {
           span.setStatus({ code: SpanStatusCode.ERROR });
           span.end();
         });
+        this.counter.add(1, {clientId: this.clientid});
       });
 
       span.end();
