@@ -1,9 +1,26 @@
 
 config.define_string('build')
 config.define_string('rider')
-config.define_string_list("args", args=True)
+config.define_string_list("to-run", args=True)
 cfg = config.parse()
-config.set_enabled_resources(cfg.get('args', []))
+print(cfg)
+groups = {
+  'app': ['hello-tilt-front', 'hello-tilt-back1', 'hello-tilt-back2'],
+  'elk': ['filebeat'],
+  'otel': []
+}
+resources = []
+groups_to_run = cfg.get('to-run', [])
+for arg in groups_to_run:
+  if arg in groups:
+    resources += groups[arg]
+  else:
+    resources.append(arg)
+
+resources.append('elk')
+resources.append('otel')
+
+config.set_enabled_resources(resources)
 buildcfg = cfg.get('build')
 riderver = cfg.get('rider', '')
 print(buildcfg)
@@ -18,14 +35,17 @@ os.putenv('MSSQL_SA_PASSWORD', mssqlpassword)
 
 secret_settings(True) 
 
-# k8s_yaml('elk/crds.yaml')
-# k8s_yaml('elk/operator.yaml')
-# k8s_yaml('elk/elasticsearch.yaml')
-# k8s_yaml('elk/kibana.yaml')
 k8s_yaml('elk/filebeat.yaml')
-# k8s_yaml('elk/logstash.yaml')
 
-# docker_compose('./otel/docker-compose.yaml')
+if 'elk' in groups_to_run:
+    local_resource('elk', serve_cmd='cd elk && docker compose up', labels=['elk'])
+else:
+    local_resource('elk', 'cd elk && docker compose down', labels=['elk'])
+
+if 'otel' in groups_to_run:
+    local_resource('otel', serve_cmd='cd otel && docker compose up', labels=['otel'])
+else:
+    local_resource('otel', 'cd otel && docker compose down', labels=['otel'])
 
 k8s_yaml(kustomize('.'))
 

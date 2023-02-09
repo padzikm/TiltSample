@@ -53,4 +53,4 @@ docker_build_with_restart(
 )
 
 k8s_yaml(kustomize('.'), allow_duplicates=True)
-k8s_resource('hello-tilt-back1', port_forwards=['22000:22'], resource_deps=['db-update-back'], labels=['back1'])
+k8s_resource('hello-tilt-back1', port_forwards=['22000:22'], resource_deps=['db-update-back', 'rabbitmq'], labels=['back1'])
