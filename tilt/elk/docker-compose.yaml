@@ -9,6 +9,7 @@ services:
     environment:
       - xpack.security.enabled=false
       - discovery.type=single-node
+      - ELASTIC_PASSWORD=elastic
     ulimits:
       memlock:
         soft: -1
@@ -16,36 +17,88 @@ services:
       nofile:
         soft: 65536
         hard: 65536
-    cap_add:
-      - IPC_LOCK
-    volumes:
-      - ./elasticsearch-data:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
+      - 9300:9300
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200"]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+
+  elastic_setup:
+    image: yauritux/busybox-curl
+    container_name: elastic_setup
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    command: |
+      sh -c '
+      curl -u elastic:elastic -XPUT -H"Content-Type: application/json" --data @- \
+        http://elasticsearch:9200/_index_template/application_template <<EOF
+      {
+        "index_patterns": ["application*"],
+        "priority": 0,
+        "template": {
+          "settings": {
+            "index.lifecycle.name": "application_policy",
+            "index.lifecycle.rollover_alias": "applicationalias",
+            "index.highlight.max_analyzed_offset": 10000000
+          }
+        }
+      }
+      EOF
+      curl -u elastic:elastic -XPUT -H"Content-Type: application/json" --data @- \
+        http://elasticsearch:9200/_ilm/policy/application_policy <<EOF
+      {
+        "policy": {
+          "phases": {
+            "hot": {
+              "actions": {
+                "rollover": {
+                  "max_size": "10GB"
+                }
+              }
+            },
+            "delete": {
+              "min_age":"1d",
+              "actions": {
+                "delete": {}
+              }
+            }
+          }
+        }
+      }
+      EOF
+      '
   
   logstash:
     container_name: logstash
     image: docker.elastic.co/logstash/logstash:8.5.3
     volumes:
-      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,Z
-      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro,Z
+      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
     ports:
       - 5044:5044
       - 50000:50000/tcp
       - 50000:50000/udp
       - 9600:9600
     environment:
-      LS_JAVA_OPTS: -Xms256m -Xmx256m
-      LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD:-}
+      LOGSTASH_INTERNAL_PASSWORD: elastic
     depends_on:
-      - elasticsearch
+      elastic_setup:
+        condition: service_completed_successfully
 
   kibana:
     container_name: kibana
     image: docker.elastic.co/kibana/kibana:8.5.3
     environment:
+      - SERVERNAME=kibana
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200 
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=elastic
+      - KIBANA_PASSWORD=elastic
     ports:
       - 5601:5601
     depends_on:
-      - elasticsearch
+      elastic_setup:
+        condition: service_completed_successfully
