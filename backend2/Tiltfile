@@ -8,6 +8,8 @@ riderver = os.getenv('riderver')
 mssqlserver = os.getenv('mssqlserver')
 mssqluser = os.getenv('mssqluser')
 mssqlpassword = os.getenv('mssqlpassword')
+elk = os.getenv('elk')
+otel = os.getenv('otel')
 
 connstring = 'Server={db_server};Database=Back2Db;User Id={db_user};Password={mssql_password};'.format(db_server=mssqlserver, db_user=mssqluser, mssql_password=mssqlpassword)
 os.putenv('MSSQLCONNECTIONSTRING', connstring)

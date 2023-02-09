@@ -18,7 +18,10 @@ using Serilog.Formatting.Compact;
 using TiltDemoApi;
 using TiltDemoApi.Msgs;
 
+var appBuilder = WebApplication.CreateBuilder(args);
+
 Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(appBuilder.Configuration)
     .Enrich.WithExceptionDetails()
     .Enrich.WithSpan()
     .Enrich.WithMachineName()
@@ -27,11 +30,9 @@ Log.Logger = new LoggerConfiguration()
     .Enrich.WithThreadId()
     .Enrich.WithThreadName()
     .Enrich.WithClientIp()
-    .WriteTo.Console(new CompactJsonFormatter())
+    // .WriteTo.Console(new CompactJsonFormatter())
     // .WriteTo.Console()
     .CreateLogger();
-
-var appBuilder = WebApplication.CreateBuilder(args);
 
 // Note: Switch between Zipkin/Jaeger/OTLP/Console by setting UseTracingExporter in appsettings.json.
 var tracingExporter = appBuilder.Configuration.GetValue<string>("UseTracingExporter").ToLowerInvariant();

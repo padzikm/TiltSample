@@ -38,13 +38,17 @@ secret_settings(True)
 k8s_yaml('elk/filebeat.yaml')
 
 if 'elk' in groups_to_run:
+    os.putenv('elk', "true")
     local_resource('elk', serve_cmd='cd elk && docker compose up', labels=['elk'])
 else:
+    os.putenv('elk', "false")
     local_resource('elk', 'cd elk && docker compose down', labels=['elk'])
 
 if 'otel' in groups_to_run:
+    os.putenv('otel', "true")
     local_resource('otel', serve_cmd='cd otel && docker compose up', labels=['otel'])
 else:
+    os.putenv('otel', "false")
     local_resource('otel', 'cd otel && docker compose down', labels=['otel'])
 
 k8s_yaml(kustomize('.'))
