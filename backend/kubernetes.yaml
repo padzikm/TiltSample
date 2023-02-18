@@ -86,5 +86,13 @@ spec:
               key: MSSQLCONNECTIONSTRING
               name: secrets
               optional: false
+        livenessProbe:
+          exec:
+            command:
+            - /app/out/live.sh
+        readinessProbe:
+          exec:
+            command:
+            - /app/out/ready.sh
 ---
             

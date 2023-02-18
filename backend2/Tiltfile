@@ -31,7 +31,8 @@ local_resource(
 
 local_resource(
     'script-back2',
-    'cp ./script.sh ./out/script.sh',
+    'cp ./script.sh ./ready.sh ./live.sh ./out',
+    deps=['script.sh', 'ready.sh', 'live.sh'],
     resource_deps=['build-back2'],
     labels=['back2']
 )

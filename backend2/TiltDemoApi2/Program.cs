@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using TiltDemoApi2.Database;
 using System.Reflection;
 using MassTransit;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using OpenTelemetry;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Instrumentation.AspNetCore;
@@ -178,6 +179,8 @@ appBuilder.Services.AddMassTransit(x =>
     });
 });
 
+appBuilder.Services.AddHealthChecks();
+
 var app = appBuilder.Build();
 
 if(metricsExporter == "prometheus")
@@ -189,6 +192,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.MapHealthChecks("/healthz/ready", new HealthCheckOptions
+{
+    Predicate = healthCheck => healthCheck.Tags.Contains("ready")
+});
+
+app.MapHealthChecks("/healthz/live", new HealthCheckOptions
+{
+    Predicate = _ => false
+});
 
 app.UseCors(x => x
     .AllowAnyHeader()
