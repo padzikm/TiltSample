@@ -74,7 +74,7 @@ appBuilder.Services.AddOpenTelemetry()
         {
             case "jaeger":
                 builder.AddJaegerExporter();
-                // Console.WriteLine("w jagerze");
+                
                 builder.ConfigureServices(services =>
                 {
                     // Use IConfiguration binding for Jaeger exporter options.

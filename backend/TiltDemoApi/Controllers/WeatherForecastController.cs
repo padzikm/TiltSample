@@ -65,26 +65,17 @@ public class WeatherForecastController : ControllerBase
     public async Task<string> GetExL()
     {
         throw new ApplicationException("sth went wrong");
-        // return t;
-        // return "Hello world16";
     }
     
     [HttpGet("exr")]
     public async Task<string> GetExR()
     {
-        // Activity.Current?.SetTag("clientid", "test23");
-        // foreach (var tt in Activity.Current?.Tags)
-        // {
-        //  _logger.LogInformation($"{tt.Key}:{tt.Value}");   
-        // }
-        // _logger.LogInformation(Activity.Current?.Tags.ToString());
         var baseurl = _config["Back2_Base_Url"];
         var url = $"{baseurl}/WeatherForecast/ex";
         var httpClient = _httpClientFactory.CreateClient();
         var res = await httpClient.GetAsync(url);
         var t = await res.Content.ReadAsStringAsync();
         return t;
-        // return "Hello world16";
     }
     
     [HttpGet("bla")]
@@ -102,7 +93,6 @@ public class WeatherForecastController : ControllerBase
             var t = await res.Content.ReadAsStringAsync();
             return t;
         }
-        // return "Hello world16";
     }
     
     [HttpGet("bla2")]
@@ -122,7 +112,6 @@ public class WeatherForecastController : ControllerBase
             var t2 = await res2.Content.ReadAsStringAsync();
             return t + t2;
         }
-        // return "Hello world16";
     }
     
     [HttpGet("savedb/{name}")]
@@ -193,7 +182,6 @@ public class WeatherForecastController : ControllerBase
     public ActionResult GetConfigMap()
     {
         var cfg = _configmap.Value;
-        Console.WriteLine("cokolwiek");
         
         return cfg == null ? Ok("null") : Ok(cfg);
     }

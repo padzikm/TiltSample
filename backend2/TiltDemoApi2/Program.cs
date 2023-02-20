@@ -57,7 +57,7 @@ appBuilder.Services.AddOpenTelemetry()
         // Tracing
 
         builder
-            // .SetSampler(new AlwaysOnSampler())
+            .SetSampler(new AlwaysOnSampler())
             .AddHttpClientInstrumentation()
             .AddAspNetCoreInstrumentation()
             .AddSqlClientInstrumentation()

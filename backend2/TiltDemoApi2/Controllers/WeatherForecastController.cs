@@ -47,9 +47,7 @@ public class WeatherForecastController : ControllerBase
             _logger.LogWarning("baggage");
             foreach (var item in Baggage.GetBaggage())
             {
-                Console.WriteLine(item.Key);
-                Console.WriteLine(item.Value);
-                ac.SetTag(item.Key, item.Value);
+                ac?.SetTag(item.Key, item.Value);
             }
 
             return "Hello world22";

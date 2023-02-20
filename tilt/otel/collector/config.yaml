@@ -5,9 +5,7 @@ receivers:
         include_metadata: true
         cors:
           allowed_origins:
-            - "*"
-          # allowed_headers:
-            # - "*"
+            - http://localhost:8080
           max_age: 7200
 exporters:
   otlp:
