@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/dotnet/aspnet:6.0
 
-RUN apt-get update && apt-get install -y openssh-server unzip wget
+RUN apt-get update && apt-get install -y openssh-server unzip wget curl
 RUN mkdir /var/run/sshd
 RUN echo 'root:root' | chpasswd
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/g' /etc/ssh/sshd_config
@@ -18,5 +18,7 @@ RUN if [ -n "$RIDER_VER" ]; then wget -O rider_debug_tools.zip "https://download
 COPY . /app/out
 WORKDIR /app/out
 RUN chmod +x ./script.sh
+RUN chmod +x ./ready.sh
+RUN chmod +x ./live.sh
 
 ENTRYPOINT exec ./script.sh

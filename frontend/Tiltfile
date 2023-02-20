@@ -38,7 +38,7 @@ local_resource(
     'script-front',
     'cp ./nginx.conf ./dist',
     deps=['nginx.conf'],
-    resource_deps=['create-dist-front'],
+    resource_deps=['create-dist-front', 'build-front'],
     labels=['front']
 )
 

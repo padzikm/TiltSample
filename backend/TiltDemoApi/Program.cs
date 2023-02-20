@@ -33,6 +33,7 @@ Log.Logger = new LoggerConfiguration()
     .Enrich.WithClientIp()
     // .WriteTo.Console(new CompactJsonFormatter())
     // .WriteTo.Console()
+    // .MinimumLevel.Debug()
     .CreateLogger();
 
 // Note: Switch between Zipkin/Jaeger/OTLP/Console by setting UseTracingExporter in appsettings.json.
@@ -59,7 +60,7 @@ appBuilder.Services.AddOpenTelemetry()
         // Tracing
 
         builder
-            // .SetSampler(new AlwaysOnSampler())
+            .SetSampler(new AlwaysOnSampler())
             .AddHttpClientInstrumentation()
             .AddAspNetCoreInstrumentation()
             .AddSqlClientInstrumentation()
@@ -88,6 +89,7 @@ appBuilder.Services.AddOpenTelemetry()
                 {
                     // Use IConfiguration directly for Otlp exporter endpoint option.
                     otlpOptions.Endpoint = new Uri(appBuilder.Configuration.GetValue<string>("Otlp:Endpoint"));
+                    otlpOptions.Protocol = OtlpExportProtocol.HttpProtobuf;
                 });
                 break;
             case "console":
