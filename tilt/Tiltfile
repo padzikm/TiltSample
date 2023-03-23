@@ -7,7 +7,8 @@ print(cfg)
 groups = {
   'app': ['hello-tilt-front', 'hello-tilt-back1', 'hello-tilt-back2'],
   'elk': ['filebeat'],
-  'otel': []
+  'otel': [],
+  'kafka': []
 }
 resources = []
 groups_to_run = cfg.get('to-run', [])
@@ -19,6 +20,7 @@ for arg in groups_to_run:
 
 resources.append('elk')
 resources.append('otel')
+resources.append('kafka')
 
 config.set_enabled_resources(resources)
 buildcfg = cfg.get('build')
@@ -37,6 +39,12 @@ secret_settings(True)
 
 k8s_yaml('elk/filebeat.yaml')
 
+if 'kafka' in groups_to_run:
+    os.putenv('kafka', "true")
+    local_resource('kafka', serve_cmd='cd kafka && docker compose up', labels=['kafka'])
+else:
+    os.putenv('kafka', "false")
+    local_resource('kafka', 'cd kafka && docker compose down', labels=['kafka'])
 if 'elk' in groups_to_run:
     os.putenv('elk', "true")
     local_resource('elk', serve_cmd='cd elk && docker compose up', labels=['elk'])

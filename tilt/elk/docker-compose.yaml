@@ -35,28 +35,15 @@ services:
     command: |
       sh -c '
       curl -u elastic:elastic -XPUT -H"Content-Type: application/json" --data @- \
-        http://elasticsearch:9200/_index_template/application_template <<EOF
-      {
-        "index_patterns": ["application*"],
-        "priority": 0,
-        "template": {
-          "settings": {
-            "index.lifecycle.name": "application_policy",
-            "index.lifecycle.rollover_alias": "applicationalias",
-            "index.highlight.max_analyzed_offset": 10000000
-          }
-        }
-      }
-      EOF
-      curl -u elastic:elastic -XPUT -H"Content-Type: application/json" --data @- \
         http://elasticsearch:9200/_ilm/policy/application_policy <<EOF
       {
         "policy": {
           "phases": {
             "hot": {
+              "min_age": "0ms",
               "actions": {
                 "rollover": {
-                  "max_size": "10GB"
+                  "max_size": "1GB"
                 }
               }
             },
@@ -66,6 +53,20 @@ services:
                 "delete": {}
               }
             }
+          }
+        }
+      }
+      EOF
+      curl -u elastic:elastic -XPUT -H"Content-Type: application/json" --data @- \
+        http://elasticsearch:9200/_index_template/application_template <<EOF
+      {
+        "index_patterns": ["application*"],
+        "priority": 1,
+        "template": {
+          "settings": {
+            "index.lifecycle.name": "application_policy",
+            "index.lifecycle.rollover_alias": "applicationalias",
+            "index.highlight.max_analyzed_offset": 10000000
           }
         }
       }
