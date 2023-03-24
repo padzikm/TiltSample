@@ -6,7 +6,7 @@ cfg = config.parse()
 print(cfg)
 groups = {
   'app': ['hello-tilt-front', 'hello-tilt-back1', 'hello-tilt-back2'],
-  'elk': ['filebeat'],
+  'elk': [],
   'otel': [],
   'kafka': []
 }
@@ -37,7 +37,7 @@ os.putenv('MSSQL_SA_PASSWORD', mssqlpassword)
 
 secret_settings(True) 
 
-k8s_yaml('elk/filebeat.yaml')
+# k8s_yaml('elk/filebeat.yaml')
 
 if 'kafka' in groups_to_run:
     os.putenv('kafka', "true")

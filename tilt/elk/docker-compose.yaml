@@ -73,21 +73,21 @@ services:
       EOF
       '
   
-  logstash:
-    container_name: logstash
-    image: docker.elastic.co/logstash/logstash:8.5.3
-    volumes:
-      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
-    ports:
-      - 5044:5044
-      - 50000:50000/tcp
-      - 50000:50000/udp
-      - 9600:9600
-    environment:
-      LOGSTASH_INTERNAL_PASSWORD: elastic
-    depends_on:
-      elastic_setup:
-        condition: service_completed_successfully
+  # logstash:
+  #   container_name: logstash
+  #   image: docker.elastic.co/logstash/logstash:8.5.3
+  #   volumes:
+  #     - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
+  #   ports:
+  #     - 5044:5044
+  #     - 50000:50000/tcp
+  #     - 50000:50000/udp
+  #     - 9600:9600
+  #   environment:
+  #     LOGSTASH_INTERNAL_PASSWORD: elastic
+  #   depends_on:
+  #     elastic_setup:
+  #       condition: service_completed_successfully
 
   kibana:
     container_name: kibana

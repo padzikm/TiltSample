@@ -1,0 +1,17 @@
+{
+    "name": "firstdata-connector", 
+    "config": {
+        "connector.class": "io.debezium.connector.sqlserver.SqlServerConnector", 
+        "database.hostname": "host.docker.internal", 
+        "database.port": "51437", 
+        "database.user": "sa", 
+        "database.password": "Password1.", 
+        "database.names": "Back1Db", 
+        "topic.prefix": "firstdata", 
+        "table.include.list": "dbo.FirstData", 
+        "schema.history.internal.kafka.bootstrap.servers": "kafka-broker:29092", 
+        "schema.history.internal.kafka.topic": "schemahistory.firstdata",
+        "database.encrypt": "false",
+        "tasks.max": "1"
+    }
+}

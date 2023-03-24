@@ -1,0 +1,10 @@
+{
+    "name": "elasticsearch-sink",
+    "config": {
+      "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
+      "tasks.max": "1",
+      "topics": "firstdata.Back1Db.dbo.FirstData",
+      "connection.url": "http://host.docker.internal:9200",
+      "write.method": "upsert"
+    }
+  }
