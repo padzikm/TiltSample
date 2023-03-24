@@ -3,6 +3,7 @@ using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Nest;
 using OpenTelemetry;
 using TiltDemoApi.Configuration;
 using TiltDemoApi.Database;
@@ -28,9 +29,11 @@ public class WeatherForecastController : ControllerBase
     private readonly IOptions<ConfigMap> _configmap;
     private readonly IPublishEndpoint _bus;
     private readonly IMessageScheduler _msgScheduler;
+    private readonly ElasticClient _elastic;
 
     public WeatherForecastController(ILogger<WeatherForecastController> logger, IHttpClientFactory httpClientFactory, AppDbContext dbContext, IConfiguration config,
-        IOptions<ConfigBack2> configback2, IOptions<ConfigFront> configfront, IOptions<ConfigMap> configmap, IPublishEndpoint bus, IMessageScheduler msgScheduler)
+        IOptions<ConfigBack2> configback2, IOptions<ConfigFront> configfront, IOptions<ConfigMap> configmap, IPublishEndpoint bus, IMessageScheduler msgScheduler,
+        ElasticClient elastic)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -41,6 +44,7 @@ public class WeatherForecastController : ControllerBase
         _configmap = configmap;
         _bus = bus;
         _msgScheduler = msgScheduler;
+        _elastic = elastic;
     }
 
     [HttpGet(Name = "GetWeatherForecast")]
@@ -200,5 +204,24 @@ public class WeatherForecastController : ControllerBase
         var u = new CreateUser() { Age = age };
         await _msgScheduler.SchedulePublish<CreateUser>(TimeSpan.FromSeconds(delay), u);
         return Ok();
+    }
+    
+    [HttpGet("searchall")]
+    public async Task<ActionResult> SearchAll()
+    {
+        var r = await this._elastic.SearchAsync<object>(p => p.Index("firstdata.back1db.dbo.firstdata").Query(q => q.MatchAll()));
+        var d = r.Documents;
+        return Ok(d);
+    }
+    
+    [HttpGet("search/{str}")]
+    public async Task<ActionResult> Search(string str)
+    {
+        var r = await this._elastic.SearchAsync<object>(p => 
+            p.Index("firstdata.back1db.dbo.firstdata")
+                .Query(q => 
+                    q.Match(m => m.Field("Name").Query(str))));
+        var d = r.Documents;
+        return Ok(d);
     }
 }

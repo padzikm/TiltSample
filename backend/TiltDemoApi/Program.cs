@@ -3,8 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using TiltDemoApi.Configuration;
 using TiltDemoApi.Database;
 using System.Reflection;
+using Elasticsearch.Net;
 using MassTransit;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Nest;
 using OpenTelemetry;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Instrumentation.AspNetCore;
@@ -187,6 +189,11 @@ appBuilder.Services.AddMassTransit(x =>
         cfg.ConfigureEndpoints(context);
     });
 });
+
+var uri = new Uri("http://host.k3d.internal:9200");
+var pool = new SingleNodeConnectionPool(uri);
+var client = new ElasticClient(new ConnectionSettings(pool));
+appBuilder.Services.AddSingleton(client);
 
 appBuilder.Services.AddHealthChecks();
 

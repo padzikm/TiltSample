@@ -86,6 +86,8 @@ spec:
               key: MSSQLCONNECTIONSTRING
               name: secrets
               optional: false
+        - name: "ELASTIC_CLIENT_APIVERSIONING"
+          value: "true"
         livenessProbe:
           exec:
             command:
