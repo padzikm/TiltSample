@@ -1,0 +1,39 @@
+{
+        "namespace": "cust",
+        "name": "prods",
+        "type": "record",
+        "fields": [
+                {"name": "mid", "type": {
+                    "type": "long",
+                    "arg.properties": {
+                        "iteration": {
+                            "start": 0
+                        }
+                    }
+                }},
+                {"name": "name", "type": {
+                    "type": "string",
+                    "arg.properties": {
+                        "iteration": {
+                            "start": 0
+                        }
+                    }
+                }},
+                {"name": "desc", "type": {
+                    "type": "string",
+                    "arg.properties": {
+                      "iteration": {
+                          "start": 0
+                      }
+                    }
+                 }},
+                 {"name": "pricey", "type": {
+                    "type": "double",
+                     "arg.properties": {
+                      "iteration": {
+                          "start": 0
+                          }
+                       }
+                  }}
+        ]
+}
