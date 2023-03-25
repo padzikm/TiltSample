@@ -2,6 +2,7 @@ using System.Diagnostics;
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
 using OpenTelemetry;
 using TiltDemoApi.MsgContracts;
 using TiltDemoApi2.Database;
@@ -19,11 +20,13 @@ public class WeatherForecastController : ControllerBase
 
     private readonly ILogger<WeatherForecastController> _logger;
     private readonly AppDbContext _dbContext;
+    private readonly MongoClient _mongoClient;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger, AppDbContext dbContext)
+    public WeatherForecastController(ILogger<WeatherForecastController> logger, AppDbContext dbContext, MongoClient mongoClient)
     {
         _logger = logger;
         _dbContext = dbContext;
+        _mongoClient = mongoClient;
     }
 
     [HttpGet(Name = "GetWeatherForecast")]
@@ -57,9 +60,13 @@ public class WeatherForecastController : ControllerBase
     [HttpGet("savedb/{age}")]
     public async Task<ActionResult> SaveData(int age)
     {
-        var m = new Model() { Date = DateTime.Now, Age = age };
-        _dbContext.SecondData.Add(m);
-        await _dbContext.SaveChangesAsync();
+        var m = new Model() { Date = DateTime.Now, Age = age, Id = age};
+        var db = _mongoClient.GetDatabase("back2");
+        var coll = db.GetCollection<Model>("sample");
+        await coll.InsertOneAsync(m);
+        
+        // _dbContext.SecondData.Add(m);
+        // await _dbContext.SaveChangesAsync();
         
         return Ok(m);
     }
@@ -67,7 +74,11 @@ public class WeatherForecastController : ControllerBase
     [HttpGet("getdb/{age}")]
     public async Task<ActionResult> GetData(int age)
     {
-        var m = await _dbContext.SecondData.Where(p => p.Age == age).ToListAsync();
+        // var m = await _dbContext.SecondData.Where(p => p.Age == age).ToListAsync();
+        var db = _mongoClient.GetDatabase("back2");
+        var coll = db.GetCollection<Model>("sample");
+        var mr = await coll.FindAsync(p => p.Age == age);
+        var m = mr.SingleOrDefault();
         
         return Ok(m);
     }

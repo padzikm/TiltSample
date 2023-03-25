@@ -3,7 +3,7 @@
     "config": {
       "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
       "tasks.max": "1",
-      "topics": "firstdata.Back1Db.dbo.FirstData",
+      "topics": "mongo.back2.sample",
       "connection.url": "http://host.docker.internal:9200",
       "write.method": "upsert",
       "behavior.on.null.values": "DELETE"

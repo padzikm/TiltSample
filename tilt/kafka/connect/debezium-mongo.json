@@ -1,0 +1,21 @@
+{
+    "name": "mongo-connector", 
+    "config": {
+      "connector.class": "io.debezium.connector.mongodb.MongoDbConnector", 
+      "mongodb.hosts": "rs0/host.docker.internal:27017", 
+      "topic.prefix": "mongo", 
+      "collection.include.list": "back2.sample",
+      "tasks.max": "1",
+      "field.renames": "back2.sample._id:id",
+      "transforms": "unwrap,extractId",
+      "transforms.unwrap.type": "io.debezium.connector.mongodb.transforms.ExtractNewDocumentState",
+      "transforms.unwrap.drop.tombstones": "false",
+      "transforms.unwrap.delete.handling.mode": "drop",
+      "transforms.extractId.type": "org.apache.kafka.connect.transforms.ExtractField$Key",
+      "transforms.extractId.field": "id",
+      "transforms.extractId.predicate": "topicNameMatch",
+      "predicates": "topicNameMatch",
+      "predicates.topicNameMatch.type": "org.apache.kafka.connect.transforms.predicates.TopicNameMatches",
+      "predicates.topicNameMatch.pattern": "mongo.back2.sample"
+    }
+  }

@@ -3,6 +3,7 @@ using TiltDemoApi2.Database;
 using System.Reflection;
 using MassTransit;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using MongoDB.Driver;
 using OpenTelemetry;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Instrumentation.AspNetCore;
@@ -159,6 +160,11 @@ appBuilder.Services.AddControllers();
 appBuilder.Services.AddEndpointsApiExplorer();
 appBuilder.Services.AddSwaggerGen();
 appBuilder.Services.AddDbContext<AppDbContext>(o => o.UseSqlServer(appBuilder.Configuration.GetConnectionString("Back2Db")));
+
+var mongoconnstr = "mongodb://mongo-0.mongo-headless.mongodb:27017";
+var client = new MongoClient(mongoconnstr);
+appBuilder.Services.AddSingleton(client);
+
 appBuilder.Services.AddCors();
 
 appBuilder.Services.AddMassTransit(x =>
