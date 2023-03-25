@@ -10,6 +10,8 @@ services:
       - xpack.security.enabled=false
       - discovery.type=single-node
       - ELASTIC_PASSWORD=elastic
+      - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
+      - bootstrap.memory_lock=true
     ulimits:
       memlock:
         soft: -1
