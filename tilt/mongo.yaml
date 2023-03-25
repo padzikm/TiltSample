@@ -55,19 +55,23 @@ spec:
     spec:
       terminationGracePeriodSeconds: 10
       containers:
+      - name: waitforit
+        image: mongo:latest
+        command: ["bash", "-c", "mongosh --eval \"try{ let s = rs.status(); if(s.ok == 1) console.log(s); }catch(ex){ if(ex.code == 94) rs.initiate({ _id: 'rs0', members: [{ _id: 0, host: 'localhost:27017' }]}); else throw ex; }\" && echo 'succeeded rs' && tail -f /dev/null"]
       - name: mongo
         image: mongo:latest
         ports:
         - containerPort: 27017
-        env:
-        - name: MONGO_INITDB_ROOT_USERNAME
-          value: "root"
-        - name: MONGO_INITDB_ROOT_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: secrets
-              key: MONGO_INITDB_ROOT_PASSWORD
-              optional: false
+        args: ['--replSet=rs0']
+        # env:
+        # - name: MONGO_INITDB_ROOT_USERNAME
+        #   value: "root"
+        # - name: MONGO_INITDB_ROOT_PASSWORD
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: secrets
+        #       key: MONGO_INITDB_ROOT_PASSWORD
+        #       optional: false
         volumeMounts:
         - name: mongo-data
           mountPath: /data/db
