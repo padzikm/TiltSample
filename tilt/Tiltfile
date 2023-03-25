@@ -5,7 +5,7 @@ config.define_string_list("to-run", args=True)
 cfg = config.parse()
 print(cfg)
 groups = {
-  'app': ['hello-tilt-front', 'hello-tilt-back1', 'hello-tilt-back2'],
+  'app': ['hello-tilt-front', 'hello-tilt-back1', 'hello-tilt-back2', 'mongo'],
   'elk': [],
   'otel': [],
   'kafka': []
@@ -60,6 +60,8 @@ else:
     local_resource('otel', 'cd otel && docker compose down', labels=['otel'])
 
 k8s_yaml(kustomize('.'))
+
+k8s_yaml('mongo.yaml')
 
 docker_build(
     'rabbitmq-local',
