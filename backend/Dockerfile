@@ -17,8 +17,11 @@ RUN if [ -n "$RIDER_VER" ]; then wget -O rider_debug_tools.zip "https://download
 
 COPY . /app/out
 WORKDIR /app/out
+
 RUN chmod +x ./script.sh
 RUN chmod +x ./ready.sh
 RUN chmod +x ./live.sh
+RUN chmod +x ./db.sh
+RUN chmod +x ./efbundle
 
 ENTRYPOINT exec ./script.sh

@@ -209,7 +209,11 @@ public class WeatherForecastController : ControllerBase
     [HttpGet("searchall")]
     public async Task<ActionResult> SearchAll()
     {
-        var r = await this._elastic.SearchAsync<object>(p => p.Index("firstdata.back1db.dbo.firstdata").Query(q => q.MatchAll()));
+        var r = await this._elastic.SearchAsync<object>(p => 
+            p.Index("firstdata.back1db.dbo.firstdata")
+                .Size(100)
+                .Query(q => 
+                    q.MatchAll()));
         var d = r.Documents;
         return Ok(d);
     }
@@ -219,6 +223,7 @@ public class WeatherForecastController : ControllerBase
     {
         var r = await this._elastic.SearchAsync<object>(p => 
             p.Index("firstdata.back1db.dbo.firstdata")
+                .Size(1000)
                 .Query(q => 
                     q.Match(m => m.Field("Name").Query(str))));
         var d = r.Documents;

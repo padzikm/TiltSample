@@ -7,7 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Confluent.Kafka" Version="2.0.2" />
+    <PackageReference Include="Confluent.SchemaRegistry.Serdes.Json" Version="2.0.2" />
     <PackageReference Include="Elastic.Clients.Elasticsearch" Version="8.0.8" />
+    <PackageReference Include="Elastic.CommonSchema.Serilog" Version="8.6.0" />
     <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.8">
       <PrivateAssets>all</PrivateAssets>

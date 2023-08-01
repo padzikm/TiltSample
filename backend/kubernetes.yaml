@@ -69,6 +69,12 @@ spec:
     metadata:
       labels:
         app: hello-tilt-back1
+        app-type: dotnet-service
+      annotations:
+        co.elastic.logs/json.overwrite_keys: "true" 
+        co.elastic.logs/json.add_error_key: "true"
+        co.elastic.logs/json.expand_keys: "true"
+        co.elastic.logs/json.keys_under_root: "true"
     spec:
       containers:
       - name: hello-tilt-back1
@@ -97,4 +103,34 @@ spec:
             command:
             - /app/out/ready.sh
 ---
-            
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hello-tilt-back1-db-migration
+  namespace: app1
+spec:
+  template:
+    metadata:
+      labels:
+        app: hello-tilt-back1-db-migration
+        app-type: dotnet-ef-bundle-db-migration
+      annotations:
+        co.elastic.logs/json.overwrite_keys: "true" 
+        co.elastic.logs/json.add_error_key: "true"
+        co.elastic.logs/json.expand_keys: "true"
+        co.elastic.logs/json.keys_under_root: "true"
+    spec:
+      containers:
+      - name: hello-tilt-back1-db-migration
+        image: hello-tilt-back1-db-migration
+        command: ["efbundle", "--connection", "$(ConnectionStrings__Back1Db)"]
+        env:
+        - name: "ConnectionStrings__Back1Db"
+          valueFrom:
+            secretKeyRef:
+              key: MSSQLCONNECTIONSTRING
+              name: secrets
+              optional: false
+      restartPolicy: OnFailure
+  backoffLimit: 30
+---
